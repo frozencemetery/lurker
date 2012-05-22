@@ -169,7 +169,7 @@ def command(self, e, cmd, c, nick):
             if len(cmd) >= 4 and cmd[:4] == "set ":
                 cmd = cmd.split(" ", 1)
                 user = cmd[1]
-                ref = ".../lurker2/rsrc/lastfm.dict"
+                ref = "../rsrc/lastfm.dict"
                 lf = open(ref, "r")
                 bill = cPickle.load(lf)
                 lf.close()
@@ -180,7 +180,7 @@ def command(self, e, cmd, c, nick):
             else:
                 user = cmd
         except:
-            ref = ".../lurker2/rsrc/lastfm.dict"
+            ref = "../rsrc/lastfm.dict"
             lf = open(ref, "r")
             bill = cPickle.load(lf)
             user = bill[nick]
@@ -203,7 +203,7 @@ def command(self, e, cmd, c, nick):
             import urllib2
             import re
             import cPickle
-            url = "http://thefuckingweather.com/?zipcode="
+            url = "http://thefuckingweather.com/?where="
             ref = "/Network/Servers/osxserver.b-aassoc.edu/Volumes/ServerDrive/NetUsers/robbie/lurker2/rsrc/tfw.dict"
             cmd = cmd.split(" ", 1)
             try:
@@ -224,29 +224,51 @@ def command(self, e, cmd, c, nick):
                 cmd = bill[nick]
             cmd = urllib2.quote(cmd)
             url = url + cmd
+            import urllib2
             response = urllib2.urlopen(url)
             m = response.read()
-            temp = int(re.search("(?<=<div id=\"content\"><div class=\"large\" >).*?(?=&deg;)", m).group(0))
-            location = re.search("(?<=<span class=\"small\">).*?(?=</span></div>)", m).group(0)
-            status = re.search("(?<=<br />).*?(?=</div>)", m).group(0).replace("<br />", "!  ") + "!"
-            paren = re.search("(?<=<span>).*?(?=</span></div>)", m).group(0)
-            tempha = int(re.search("(?<=<td>HIGH:</td><td class=\"center hot\">).*?(?=</td>)", m).group(0))
-            temphb = int(re.search("(?<!HIGH:)</td><td class=\"center hot\">.*?(?=</td>)", m).group(0).replace("</td><td class=\"center hot\">", ""))
-            templa = int(re.search("(?<=<td class=\"center cold\">).*?(?=</td>)", m).group(0))
-            templb = int(re.search("(?<!LOW:)</td><td class=\"center cold\">.*?(?=</td>)", m).group(0).replace("</td><td class=\"center cold\">", ""))
-            daya = re.search("(?<=<td class=\"center\"><strong>).*?(?=</strong></td>)", m).group(0)
-            dayb = re.search("(?<=</strong></td>\n<td class=\"center\"><strong>).*?(?=</strong></td>)", m).group(0)
-            fca = re.search("(?<=FORECAST:</td><td class=\"center\">).*?(?=</td>)", m).group(0)
-            fcb = re.search("(?<!:)</td><td class=\"center\">.*?(?=</td></tr>)", m).group(0).replace("</td><td class=\"center\">", "")
+            temp = int(re.search("(?<=<span class=\"temperature\" tempf=\").*?(?=\">)", m).group(0))
+            location = re.search("(?<=<span id=\"locationDisplaySpan\" class=\"small\">).*?(?=</span>)", m).group(0)
+            status = re.search("(?<=<p class=\"remark\">).*?(?=</p>)", m).group(0)
+            paren = re.search("(?<=<p class=\"flavor\">).*?(?=</p>)", m).group(0)
+            dayv = re.search("(?<=<th>DAY</th><th style=\"width:7.5em;\">).*(?=</th>)", m).group(0)
+            highv = re.search("(?<=<th>HIGH</th><td class=\"temperature\" tempf=\").*(?=\r)", m).group(0)
+            lowv = re.search("(?<=<th>LOW</th><td class=\"temperature\" tempf=\").*(?=\r)", m).group(0)
+            fcv = re.search("(?<=<th>FORECAST</th><td>).*(?=\r)", m).group(0)
+
+            highv = re.search("(?<=<td class=\"temperature\" tempf=\").*", highv).group(0)
+            tempha = int(re.search(".*?(?=\">)", highv).group(0))
+            highv = re.search("(?<=tempf=\").*", highv).group(0)
+            templa = int(re.search(".*?(?=\">)", lowv).group(0))
+            lowv = re.search("(?<=tempf=\").*", lowv).group(0)
+            fca = re.search(".*?(?=</td>)", fcv).group(0)
+            fcv = re.search("(?<=<td>).*", fcv).group(0)
+            daya = re.search(".*?(?=</th>)", dayv).group(0)
+            dayv = re.search("(?<=em;\">).*", dayv).group(0)
+            dayb = re.search(".*?(?=</th>)", dayv).group(0)
+            temphb = int(re.search(".*?(?=\">)", highv).group(0))
+            templb = int(re.search(".*?(?=\">)", lowv).group(0))
+            fcb = re.search(".*?(?=</td>)", fcv).group(0)
+
             magic = "\x02" + location + "\x0F: " + str(temp) + " F (" + str(coff(temp)) + " C) | " + status + " (" + paren + ") | " + daya + ": High " + str(tempha) + " F (" + str(coff(tempha)) + " C), Low " + str(templa) + " F (" + str(coff(templa)) + " C).  " + fca + " | " + dayb + ": High " + str(temphb) + " F (" + str(coff(temphb)) + " C), Low " + str(templb) + " F (" + str(coff(templb)) + " C).  " + fcb
             magic = magic.replace("ITS", "IT'S")
-            c.privmsg(channel, magic)
+            import random
+            switch = random.randint(1,20)
+            if switch == 1:
+                c.privmsg(channel, "IT'S RAINING MEN")
+                pass
+            elif switch == 2:
+                c.privmsg(channel, "CHOCOLATE RAIN")
+                pass
+            else:
+                c.privmsg(channel, magic)
+                pass
         except:
             c.privmsg(channel, "Syntax is !fw <location>.  If you have invoked !fw set <location>, you may invoke !fw.")
         executed = 1
     elif cmd[:6] == "alert ":
         import time
-        stof = ".../lurker2/rsrc/alerts.db"
+        stof = "../rsrc/alerts.db"
         read = open(stof, "a")
         cmd = e.source() + " " + cmd.split(" ", 1)[1] 
         if len(cmd) > 380:
@@ -257,7 +279,7 @@ def command(self, e, cmd, c, nick):
         c.privmsg(channel, "Reminder saved.")
         executed == 1
     elif cmd[:10] == "anonalert ":
-        stof = ".../lurker2/rsrc/alerts.db"
+        stof = "../rsrc/alerts.db"
         read = open(stof, "a")
         cmd = "<anonymous_user> " + cmd.split(" ", 1)[1]
         if len(cmd) > 380:
@@ -269,7 +291,7 @@ def command(self, e, cmd, c, nick):
         executed == 1
     elif cmd == "convo":
         import random
-#        stof = ".../lurker2/rsrc/convo.db"
+#        stof = "../rsrc/convo.db"
 #        read = open(stof, 'r')
 #        finalline = ""
 #        numread = 0
@@ -280,7 +302,7 @@ def command(self, e, cmd, c, nick):
 #                finalline = line
 #        read.close()
 #        c.privmsg(channel, finalline)
-        stof = ".../lurker2/rsrc/convo.db"
+        stof = "../rsrc/convo.db"
         read = open(stof, 'r')
         linecount = 0
         for line in read:
@@ -297,13 +319,13 @@ def command(self, e, cmd, c, nick):
         c.privmsg(channel, finalline)
     elif cmd[:10] == "convo add ":
         cmd = cmd.split(" ", 2)[2]
-        stof = open(".../lurker2/rsrc/convo.db", 'a')
+        stof = open("../rsrc/convo.db", 'a')
         stof.write(cmd + '\n')
         stof.close()
         finalline = "NOW WE'RE HAVING A GOOD TIME RIGHT"
         c.privmsg(channel, finalline)
     elif cmd[:6] == "source":
-        c.privmsg(channel, nick + ": You can find my source at...um...hopefully on nongnu.org soon!")
+        c.privmsg(channel, nick + ": You can find my source at https://savannah.nongnu.org/projects/lurker and BTS at https://savannah.nongnu.org/bugs/?group=lurker")
     elif cmd[:2] == "q " or cmd[:4] == "ddg " or cmd[:6] == "quack ":
         cmd = cmd.split(" ", 1)[1]
         url = "https://duckduckgo.com/html?kp=-1&q="
@@ -315,6 +337,17 @@ def command(self, e, cmd, c, nick):
         executed = 1
     elif cmd[:4] == "ping":
         c.action(channel, "squeaks at " + nick)
+        executed = 1
+        pass
+    elif cmd == "static":
+        import random
+        d = random.randint(0,1)
+        if d == 0:
+            c.action(channel, "ssssssssssssSSSSSSSSSSSSHHHHHHHHHHHHHHHHHHHHHHHHHHHHHhsssssssssssssssssssssZachery.  Acetaminophen.  Beige.ssssssssssssSSSSSSSSSSSSHHHHHHHHHHHHHHHHHHHHHHHHHHHHHhsssssssssssssssssssss")
+            pass
+        else:
+            c.action(channel, "performs a gymnastics move while having complete motion control the entire time, with no bursts of movement")
+            pass
         executed = 1
         pass
     elif cmd[:8] == "lantunes" or cmd[:2] == "lt":
