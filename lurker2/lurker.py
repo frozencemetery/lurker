@@ -20,9 +20,8 @@
 
 import do
 import time
-from ircbot import SingleServerIRCBot
-from irclib import nm_to_n, nm_to_h, irc_lower, ip_numstr_to_quad, ip_quad_to_numstr
-
+from irc.bot import SingleServerIRCBot
+from irc.client import nm_to_n, nm_to_h, irc_lower, ip_numstr_to_quad, ip_quad_to_numstr
 class TestBot(SingleServerIRCBot):    
     def __init__(self, channel, nickname, server, port=6667):
         SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
@@ -32,7 +31,7 @@ class TestBot(SingleServerIRCBot):
         c.nick(c.get_nickname() + "_")
 
     def on_join(self, c, e):
-        outref = ".../lurker2/rsrc/alerts.db"
+        outref = "rsrc/alerts.db"
         alpha = open(outref, 'r')
         beta = ""
         nick = nm_to_n(e.source())
@@ -63,7 +62,7 @@ class TestBot(SingleServerIRCBot):
         commandchar = "!"
         a = e.arguments()[0]
         a = a.strip()
-        outref = ".../lurker2/rsrc/alerts.db"
+        outref = "rsrc/alerts.db"
         alpha = open(outref, 'r')
         beta = ""
         nick = nm_to_n(e.source())
@@ -121,7 +120,7 @@ class TestBot(SingleServerIRCBot):
         a = e.arguments()[0]
         a = a.strip()
 
-        outref = ".../lurker2/rsrc/alerts.db"
+        outref = "rsrc/alerts.db"
         alpha = open(outref, 'r')
         beta = ""
         nick = nm_to_n(e.source())

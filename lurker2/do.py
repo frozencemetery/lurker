@@ -169,7 +169,7 @@ def command(self, e, cmd, c, nick):
             if len(cmd) >= 4 and cmd[:4] == "set ":
                 cmd = cmd.split(" ", 1)
                 user = cmd[1]
-                ref = "../rsrc/lastfm.dict"
+                ref = "rsrc/lastfm.dict"
                 lf = open(ref, "r")
                 bill = cPickle.load(lf)
                 lf.close()
@@ -180,7 +180,7 @@ def command(self, e, cmd, c, nick):
             else:
                 user = cmd
         except:
-            ref = "../rsrc/lastfm.dict"
+            ref = "rsrc/lastfm.dict"
             lf = open(ref, "r")
             bill = cPickle.load(lf)
             user = bill[nick]
@@ -204,7 +204,7 @@ def command(self, e, cmd, c, nick):
             import re
             import cPickle
             url = "http://thefuckingweather.com/?where="
-            ref = "/Network/Servers/osxserver.b-aassoc.edu/Volumes/ServerDrive/NetUsers/robbie/lurker2/rsrc/tfw.dict"
+            ref = "rsrc/tfw.dict"
             cmd = cmd.split(" ", 1)
             try:
                 cmd = cmd[1]
@@ -268,7 +268,7 @@ def command(self, e, cmd, c, nick):
         executed = 1
     elif cmd[:6] == "alert ":
         import time
-        stof = "../rsrc/alerts.db"
+        stof = "rsrc/alerts.db"
         read = open(stof, "a")
         cmd = e.source() + " " + cmd.split(" ", 1)[1] 
         if len(cmd) > 380:
@@ -279,7 +279,7 @@ def command(self, e, cmd, c, nick):
         c.privmsg(channel, "Reminder saved.")
         executed == 1
     elif cmd[:10] == "anonalert ":
-        stof = "../rsrc/alerts.db"
+        stof = "rsrc/alerts.db"
         read = open(stof, "a")
         cmd = "<anonymous_user> " + cmd.split(" ", 1)[1]
         if len(cmd) > 380:
@@ -291,7 +291,7 @@ def command(self, e, cmd, c, nick):
         executed == 1
     elif cmd == "convo":
         import random
-#        stof = "../rsrc/convo.db"
+#        stof = "rsrc/convo.db"
 #        read = open(stof, 'r')
 #        finalline = ""
 #        numread = 0
@@ -302,7 +302,7 @@ def command(self, e, cmd, c, nick):
 #                finalline = line
 #        read.close()
 #        c.privmsg(channel, finalline)
-        stof = "../rsrc/convo.db"
+        stof = "rsrc/convo.db"
         read = open(stof, 'r')
         linecount = 0
         for line in read:
@@ -319,7 +319,7 @@ def command(self, e, cmd, c, nick):
         c.privmsg(channel, finalline)
     elif cmd[:10] == "convo add ":
         cmd = cmd.split(" ", 2)[2]
-        stof = open("../rsrc/convo.db", 'a')
+        stof = open("rsrc/convo.db", 'a')
         stof.write(cmd + '\n')
         stof.close()
         finalline = "NOW WE'RE HAVING A GOOD TIME RIGHT"
