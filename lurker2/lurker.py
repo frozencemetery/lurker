@@ -26,24 +26,31 @@ class TestBot(SingleServerIRCBot):
     def __init__(self, channel, nickname, server, port=6667):
         SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
         self.channel = channel
+        pass
 
     def on_nicknameinuse(self, c, e):
         c.nick(c.get_nickname() + "_")
+        pass
 
     def on_join(self, c, e):
         outref = "rsrc/alerts.db"
         alpha = open(outref, 'r')
         beta = ""
-        nick = nm_to_n(e.source())
+        nick = nm_to_n(e.source())n
         for line in alpha:
             try:
                 linebeta = line.split(" ", 2)
                 if linebeta[1] == nick:
                     c.privmsg(nick, linebeta[0] + " told me to tell you " + linebeta[2])
+                    pass
                 else:
                     beta = beta + line
+                    pass
+                pass
             except:
                 beta = beta
+                pass
+            pass
         alpha.close()
         alpha = open(outref, "w")
         alpha.write(beta)
@@ -51,6 +58,7 @@ class TestBot(SingleServerIRCBot):
         channel = e._target
         if channel == "#zathrassrv":
             c.privmsg(channel, nick + " joined the irc side.")
+            pass
         return
 
     def on_welcome(self, c, e):
@@ -71,10 +79,15 @@ class TestBot(SingleServerIRCBot):
                 linebeta = line.split(" ", 2)
                 if linebeta[1] == nick:
                     c.privmsg(nick, linebeta[0] + " told me to tell you " + linebeta[2])
+                    pass
                 else:
                     beta = beta + line
+                    pass
+                pass
             except:
                 beta = beta
+                pass
+            pass
         alpha.close()
         alpha = open(outref, "w")
         alpha.write(beta)
@@ -82,6 +95,7 @@ class TestBot(SingleServerIRCBot):
         
         if a == "sup" or a == "sup." or a == "sup?":
             c.privmsg(e.target(), "notmuch")
+            pass
 
         if a[:1] == commandchar:
             a = a.lstrip(commandchar)
@@ -129,14 +143,20 @@ class TestBot(SingleServerIRCBot):
                 linebeta = line.split(" ", 2)
                 if linebeta[1] == nick:
                     c.privmsg(nick, linebeta[0] + " told me to tell you " + linebeta[2])
+                    pass
                 else:
                     beta = beta + line
+                    pass
+                pass
             except:
                 beta = beta
+                pass
+            pass
         alpha.close()
 
         if a == "sup" or a == "sup." or a == "sup?":
             c.privmsg(e.target(), "notmuch")
+            pass
 
         alpha = open(outref, "w")
         alpha.write(beta)
@@ -145,6 +165,7 @@ class TestBot(SingleServerIRCBot):
         if a[:1] == commandchar:
             a = a.lstrip(commandchar)
             self.do_command(e, a)
+            pass
         return
 
     def do_command(self, e, cmd):
@@ -153,35 +174,49 @@ class TestBot(SingleServerIRCBot):
         channel = e.target()
         if channel[:1] != "#" and channel[:1] != "&" and channel[:1] != "+" and channel[:1] != "!":
             channel = "(prvt)"
+            pass
         print time.strftime("[%Y-%m-%d %H:%M:%S]") + " (" + channel + ") <" + nick + "> " + cmd
         if cmd[:6] == "reload" and nick == "frozencemetery":
             z = cmd.split(" ", 1)
             if len(z) == 2:
                 do.reset(z[1])
+                pass
             else:
                 reload(do)
+                pass
+            pass
         else:
             try:
                 do.command(self, e, cmd, c, nick)
+                pass
             except:
                 pass
+            pass
+        pass
+    
+    pass
 
 def main():
     import sys
     if len(sys.argv) != 4 and len(sys.argv) != 5:
         print "Syntax is: \"python lurker.py <server[:port]> <nick> <chan> [<pass>]\""
         sys.exit(1)
-
+        pass
+    
     s = sys.argv[1].split(":", 1)
     server = s[0]
     if len(s) == 2:
         try:
             port = int(s[1])
+            pass
         except ValueError:
             print "PORT IS TOO WEIRD!"
             sys.exit(1)
+            pass
+        pass
     else:
         port = 6667
+        pass
 
     nickname = sys.argv[2]
     
@@ -189,12 +224,10 @@ def main():
     
     try:
         channel = channel + " " + sys.argv[4]
+        pass
     except:
         pass
     
-    
     bot = TestBot(channel, nickname, server, port)
     bot.start()
-
-if __name__ == "__main__":
-    main()
+    pass

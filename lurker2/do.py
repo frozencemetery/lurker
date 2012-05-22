@@ -29,11 +29,13 @@ def command(self, e, cmd, c, nick):
     channel = e.target()
     if channel[:1] != "#" and channel[:1] != "&" and channel[:1] != "+" and channel[:1] != "!": # checking for private queries and responding accordingly
         channel = nick
+        pass
     if nick == "frozencemetery": # my commands.
         if cmd[:5] == "nick ":
             cmd = cmd.split(" ", 1)[1]
             c.nick(cmd)
             executed = 1
+            pass
         elif cmd[:9] == "broadcast":
             executed = 1
             import random
@@ -41,11 +43,13 @@ def command(self, e, cmd, c, nick):
             if len(s) != 3:
                 c.privmsg(nick, "Parsing error on token: " + cmd)
                 f.write("Parsing error on token: " + cmd)
+                pass
             else:
                 t = s[2].split("d", 1)
                 if len(t) != 2:
                     c.privmsg(nick, "Parsing error on token: " + cmd)
                     f.write("Parsing error on token: " + cmd)
+                    pass
                 else :
                     testa = t[1].split("+", 1) #
                     testb = t[1].split("-", 1) #
@@ -53,48 +57,65 @@ def command(self, e, cmd, c, nick):
                         numtoroll = int(t[0])
                         sidenum = int(testb[0])
                         bonus = -int(testb[1])
+                        pass
                     elif len(testa[0]) < len(testb[0]):
                         numtoroll = int(t[0])
                         sidenum = int(testa[0])
                         bonus = int(testa[1])
+                        pass
                     else: # the two were equal; in other words, no bonus
                         numtoroll = int(t[0])
                         sidenum = int(testa[0])
                         bonus = 0
+                        pass
                     if numtoroll < 1:
                         numtoroll = 1
+                        pass
                     if sidenum <2:
                         counter = numtoroll
+                        pass
                     else :
                         counter, i = 0, 0
                         while i < numtoroll:
                             roll = random.randint(1, sidenum);
                             counter = counter + roll;
                             i = i + 1;
+                            pass
+                        pass
                     counter = counter + bonus
                     c.privmsg(s[1], nick + " rolled a " +str(counter))
+                    pass
+                pass
+            pass
         if cmd == "disconnect":
             self.disconnect()
             executed = 1
+            pass
         if cmd == "test":
             c.privmsg(channel, e.source())
             executed = 1
+            pass
         elif cmd == "die":
             self.die()
             executed = 1
+            pass
         elif cmd[:4] == "join":
             z = cmd.split(" ", 1) 
             disp = z[1].split(" ", 1) 
             c.join(z[1])
             executed = 1
+            pass
         elif cmd[:3] == "say":
             z = cmd.split(" ", 2)
             c.privmsg(z[1], z[2])
             executed = 1
+            pass
         elif cmd[:6] == "action":
             z=cmd.split(" ", 2) 
             c.action(z[1], z[2])
             executed = 1
+            pass
+        pass
     # commands for all
     if cmd[:4] == "roll": 
         executed = 1
@@ -103,10 +124,12 @@ def command(self, e, cmd, c, nick):
         if len(s) != 2:
             c.privmsg(channel, "Syntax is: \"roll xdy[\xc2z]\".")
             # \xc2 is the plusorminus character
+            pass
         else:
             t = s[1].split("d", 1) 
             if len(t) != 2:
                 c.privmsg(channel, "Syntax is: \"roll xdy[\xc2z]\".")
+                pass
             else :
                 testa = t[1].split("+", 1) #
                 testb = t[1].split("-", 1) #
@@ -114,37 +137,51 @@ def command(self, e, cmd, c, nick):
                     numtoroll = int(t[0])
                     sidenum = int(testb[0])
                     bonus = -int(testb[1])
+                    pass
                 elif len(testa[0]) < len(testb[0]): #testa's split is better
                     numtoroll = int(t[0])
                     sidenum = int(testa[0])
                     bonus = int(testa[1])
+                    pass
                 else: # the two were equal; in other words, no bonus
                     numtoroll = int(t[0])
                     sidenum = int(testa[0])
                     bonus = 0
+                    pass
                 if numtoroll < 1:
                     numtoroll = 1
-                if sidenum <2:
+                    pass
+                if sidenum < 2:
                     counter = numtoroll
+                    pass
                 else :
                     counter, i = 0, 0
                     while i < numtoroll:
                         roll = random.randint(1, sidenum);
                         counter = counter + roll;
                         i = i + 1;
+                        pass
+                    pass
                 counter = counter + bonus
                 if nick != "robbie" and channel == nick:
                     c.privmsg("robbie", "I rolled : " + str(counter) + " for " + nick + ".")
+                    pass
                 c.privmsg(channel, "I rolled : " + str(counter) + " for " + nick + ".")
+                pass
+            pass
+        pass
     elif cmd[:4] == "help":
-        c.privmsg(channel, nick + ": https://paste.debian.net/plainh/47aa547e is the current version.  Bother frozencementery to make it better if it's missing something, or if you want a function you don't see there.")
+        c.privmsg(channel, nick + ": https://paste.debian.net/plainh/47aa547e is the current version.  My BTS can be found at https://savannah.nongnu.org/bugs/?group=lurker")
+        pass
     elif cmd == "hug me":
         executed = 1
         c.action(channel, "hugs " + nick + ".")
+        pass
     elif cmd[:4] == "hug ":
         executed = 1
         name = cmd.split(" ", 1)[1]
         c.action(channel, "hugs " + name + ".")
+        pass
     elif cmd[:3] == "fml":
         import urllib2
         import re
@@ -156,9 +193,11 @@ def command(self, e, cmd, c, nick):
         lst = re.findall("\<.*?>", res)
         for x in lst:
             res = res.replace(x, "")
+            pass
         res = res.replace("&quot;", "\"")
         c.privmsg(channel, nick + ": " + res)
         executed = 1
+        pass
     elif cmd[:2]== "fm" or cmd[:2] == "np":
         import urllib2
         import re
@@ -177,14 +216,18 @@ def command(self, e, cmd, c, nick):
                 lf = open(ref, "w")
                 cPickle.dump(bill, lf)
                 lf.close()
+                pass
             else:
                 user = cmd
+                pass
+            pass
         except:
             ref = "rsrc/lastfm.dict"
             lf = open(ref, "r")
             bill = cPickle.load(lf)
             user = bill[nick]
             lf.close()
+            pass
         url = "http://ws.audioscrobbler.com/1.0/user/" + user + "/recenttracks.rss"
         response = urllib2.urlopen(url)
         urlload = response.read()
@@ -198,6 +241,8 @@ def command(self, e, cmd, c, nick):
         ct = m.replace("/_/", " - ")
         ct = urllib2.unquote(ct)
         c.privmsg(channel, nick + ": " + ct)
+        executed = 1
+        pass
     elif cmd[:2] == "fw":
         try:
             import urllib2
@@ -217,11 +262,14 @@ def command(self, e, cmd, c, nick):
                     fw = open(ref, "w")
                     cPickle.dump(bill, fw)
                     fw.close()
+                    pass
+                pass
             except:
                 fw = open(ref, "r")
                 bill = cPickle.load(fw)
                 fw.close()
                 cmd = bill[nick]
+                pass
             cmd = urllib2.quote(cmd)
             url = url + cmd
             import urllib2
@@ -266,9 +314,12 @@ def command(self, e, cmd, c, nick):
             else:
                 c.privmsg(channel, magic)
                 pass
+            pass
         except:
             c.privmsg(channel, "Syntax is !fw <location>.  If you have invoked !fw set <location>, you may invoke !fw.")
+            pass
         executed = 1
+        pass
     elif cmd[:6] == "alert ":
         import time
         stof = "rsrc/alerts.db"
@@ -276,40 +327,34 @@ def command(self, e, cmd, c, nick):
         cmd = e.source() + " " + cmd.split(" ", 1)[1] 
         if len(cmd) > 380:
             cmd = cmd[:380]
+            pass
         cmd += time.strftime(" at %Y:%m:%d:%H:%M:%S")
         read.write(cmd + "\n")
         read.close()
         c.privmsg(channel, "Reminder saved.")
-        executed == 1
+        executed = 1
+        pass
     elif cmd[:10] == "anonalert ":
         stof = "rsrc/alerts.db"
         read = open(stof, "a")
         cmd = "<anonymous_user> " + cmd.split(" ", 1)[1]
         if len(cmd) > 380:
             cmd = cmd[:380]
+            pass
         cmd += time.strftime(" at %Y:%m:%d:%H:%M:%S")
         read.write(cmd + "\n")
         read.close()
         c.privmsg(channel, "Reminder saved.")
-        executed == 1
+        executed = 1
+        pass
     elif cmd == "convo":
         import random
-#        stof = "rsrc/convo.db"
-#        read = open(stof, 'r')
-#        finalline = ""
-#        numread = 0
-#        for line in read:
-#            numread += 1
-#            prob = random.randint(1, numread);
-#            if prob == 1:
-#                finalline = line
-#        read.close()
-#        c.privmsg(channel, finalline)
         stof = "rsrc/convo.db"
         read = open(stof, 'r')
         linecount = 0
         for line in read:
             linecount += 1
+            pass
         read.close()
         choice = random.randint(0, linecount-1)
         read = open(stof, 'r')
@@ -317,9 +362,13 @@ def command(self, e, cmd, c, nick):
         for line in read:
             if choice == 0:
                 finalline = line
+                pass
             choice -= 1
+            pass
         read.close()
         c.privmsg(channel, finalline)
+        executed = 1
+        pass
     elif cmd[:10] == "convo add ":
         cmd = cmd.split(" ", 2)[2]
         stof = open("rsrc/convo.db", 'a')
@@ -327,30 +376,30 @@ def command(self, e, cmd, c, nick):
         stof.close()
         finalline = "NOW WE'RE HAVING A GOOD TIME RIGHT"
         c.privmsg(channel, finalline)
+        executed = 1
+        pass
     elif cmd[:6] == "source":
         c.privmsg(channel, nick + ": You can find my source at https://savannah.nongnu.org/projects/lurker and BTS at https://savannah.nongnu.org/bugs/?group=lurker")
+        executed = 1
+        pass
     elif cmd[:2] == "q " or cmd[:4] == "ddg " or cmd[:6] == "quack ":
         cmd = cmd.split(" ", 1)[1]
         url = "https://duckduckgo.com/html?kp=-1&q="
         import urllib
         beep = urllib.quote_plus(cmd)
         c.privmsg(channel, nick + ": " + url + beep)
+        executed = 1
+        pass
     elif cmd[:4] == "test":
         c.privmsg(channel, nick + ": blargl")
         executed = 1
+        pass
     elif cmd[:4] == "ping":
         c.action(channel, "squeaks at " + nick)
         executed = 1
         pass
-    elif cmd == "static":
-        import random
-        d = random.randint(0,1)
-        if d == 0:
-            c.action(channel, "ssssssssssssSSSSSSSSSSSSHHHHHHHHHHHHHHHHHHHHHHHHHHHHHhsssssssssssssssssssssZachery.  Acetaminophen.  Beige.ssssssssssssSSSSSSSSSSSSHHHHHHHHHHHHHHHHHHHHHHHHHHHHHhsssssssssssssssssssss")
-            pass
-        else:
-            c.action(channel, "performs a gymnastics move while having complete motion control the entire time, with no bursts of movement")
-            pass
+    elif cmd == "static":        
+        c.action(channel, "ssssssssssssSSSSSSSSSSSSHHHHHHHHHHHHHHHHHHHHHHHHHHHHHhsssssssssssssssssssss")
         executed = 1
         pass
     elif cmd[:8] == "lantunes" or cmd[:2] == "lt":
@@ -401,13 +450,11 @@ def command(self, e, cmd, c, nick):
         pass        
     elif len(cmd) <= 0:
         return
-    elif executed == 0:
+    if executed == 0:
         print "Failed."
         c.action(channel, "doesn't know how to " + cmd + ".")
+        pass
+    pass
 
 def reset(command):
-    return;
-#    if command == ""
-#        reload()
-#    elif command ==""
-#        reload()
+    return
