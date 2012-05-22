@@ -253,12 +253,15 @@ def command(self, e, cmd, c, nick):
             magic = "\x02" + location + "\x0F: " + str(temp) + " F (" + str(coff(temp)) + " C) | " + status + " (" + paren + ") | " + daya + ": High " + str(tempha) + " F (" + str(coff(tempha)) + " C), Low " + str(templa) + " F (" + str(coff(templa)) + " C).  " + fca + " | " + dayb + ": High " + str(temphb) + " F (" + str(coff(temphb)) + " C), Low " + str(templb) + " F (" + str(coff(templb)) + " C).  " + fcb
             magic = magic.replace("ITS", "IT'S")
             import random
-            switch = random.randint(1,20)
+            switch = random.randint(1,30)
             if switch == 1:
                 c.privmsg(channel, "IT'S RAINING MEN")
                 pass
             elif switch == 2:
                 c.privmsg(channel, "CHOCOLATE RAIN")
+                pass
+            elif switch == 3:
+                c.privmsg(channel, "Cloudy.  With a chance of meatballs.")
                 pass
             else:
                 c.privmsg(channel, magic)
