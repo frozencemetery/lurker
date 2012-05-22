@@ -36,7 +36,7 @@ def command(self, e, cmd, c, nick):
             c.nick(cmd)
             executed = 1
             pass
-        elif cmd[:9] == "broadcast":
+        elif cmd[:9] == "sendroll ":
             executed = 1
             import random
             s = cmd.split(" ", 2)
