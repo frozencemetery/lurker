@@ -455,6 +455,3 @@ def command(self, e, cmd, c, nick):
         c.action(channel, "doesn't know how to " + cmd + ".")
         pass
     pass
-
-def reset(command):
-    return

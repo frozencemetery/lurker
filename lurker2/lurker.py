@@ -172,14 +172,8 @@ class TestBot(SingleServerIRCBot):
             channel = "(prvt)"
             pass
         print time.strftime("[%Y-%m-%d %H:%M:%S]") + " (" + channel + ") <" + nick + "> " + cmd
-        if cmd[:6] == "reload" and nick == "frozencemetery":
-            z = cmd.split(" ", 1)
-            if len(z) == 2:
-                do.reset(z[1])
-                pass
-            else:
-                reload(do)
-                pass
+        if cmd == "reload":
+            reload(do)
             pass
         else:
             try:
