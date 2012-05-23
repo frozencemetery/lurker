@@ -1,11 +1,10 @@
 * lurker exports the following commands to regular users:
-- !help: Brings you here.
-- !source: Takes you to where you can find a copy of lurker's source.
 - !roll <quantity>d<sides>[±<modifier>]: Rolls quantity dice of sides sides,
   and optionally adds or subtracts the modifier to the result.  Follows rules
   of D&D.
+- !help: Brings you here.
 - !hug me: Hugs the user.
-- !hug <user>: Hugs user in the current medium of communication.
+- !hug <target>: Hugs target in the current setting.
 - !fml: Prints a random FMyLife entry (by popular demand).
 - !np / !fm: If your user name is set with the bot, prints your currently
   playing track.
@@ -16,22 +15,26 @@
   your location.
 - !fw set <place>: Sets your location with the bot to place (zip codes work
   best; this is a problem with The Fucking Weather's parser, not with lurker).
-- !fw <place>: Shows the weather for place; see note on places above..
-- !convo: Prints a conversation starter.
-- !convo add <wit>: Adds a conversation starter to the database in the form of
-  wit.
-- !quack <query> / !q <query> / !ddg <query>: Generates a DuckDuckGo result
-  page for query (note that due to DuckDuckGo's bangs, this may be a redirect;
-  e.g., the result of "!q !w debian").
+- !fw <place>: Shows the weather for place; see note on places above.
 - !alert <user> <message>: Adds a pounce on user to tell them message.
 - !anonalert <user> <message>: Adds an anonymous pounce on user to tell them
   message.
+- !convo: Prints a conversation starter.
+- !convo add <wit>: Adds a conversation starter to the database in the form of
+  wit.
+- !source: Takes you to where you can find a copy of lurker's source.
+- !quack <query> / !q <query> / !ddg <query>: Generates a DuckDuckGo result
+  page for query (note that due to DuckDuckGo's bangs, this may be a redirect;
+  e.g., the result of "!q !w debian").
+- !test: Reserved keyword for whatever I happen to be testing.  Documented so
+  that it will not be taken.
 - !ping: Causes lurker to respond (useful for those who don't want to be
   hugged).
-* lurker exports the following commands to the privileged user
+- !static: lurker dumps some static.
+- !lantunes / !lt: Displays the current track in lantunes.  Currently, there
+  is only one (known) lantunes installation.
+* lurker exports the following commands to the privileged user:
 - !nick <newnick>: Changes the nick of lurker to newnick.
-- !sendroll <target> <quantity>d<sides>[±<modifier>]: same as roll except that
-  the result is sent to target (channel or nick).
 - !disconnect: Disconnects lurker.
 - !test: Reserved keyword for whatever I happen to be testing.  Documented so
   that it will not be taken.
@@ -40,3 +43,13 @@
 - !say <target> <item>: Says item to target.  Target can be a nick or
   channel.  Item can contain spaces.
 - !action <target> <item>: Same as !say except with actions.
+* commands not yet exported:
+- !reload: Reloads the do module.  Currently working, but this is not the
+  intended calling / location convention.
+- !sendroll <target> <quantity>d<sides>[±<modifier>]: same as roll except that
+  the result is sent to target (channel or nick).  Currently fully working and
+  slated for deprecation.
+- !seen <user>: Currently not supported.  Will display the time at which the
+  user last spoke.
+- !broadcast <target> <commmand>: Currently not supported.  Will broadcast the
+  command to the specified target.  !sendroll will be deprecated by this.
