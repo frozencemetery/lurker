@@ -56,10 +56,6 @@ class TestBot(SingleServerIRCBot):
         alpha.write(beta)
         alpha.close()
         channel = e._target
-        if channel == "#zathrassrv":
-            c.privmsg(channel, nick + " joined the irc side.")
-            pass
-        return
 
     def on_welcome(self, c, e):
         c.privmsg("NickServ", "IDENTIFY ********")
