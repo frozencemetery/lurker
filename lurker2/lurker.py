@@ -89,10 +89,6 @@ class TestBot(SingleServerIRCBot):
         alpha.write(beta)
         alpha.close()
         
-        if a == "sup" or a == "sup." or a == "sup?":
-            c.privmsg(e.target(), "notmuch")
-            pass
-
         if a[:1] == commandchar:
             a = a.lstrip(commandchar)
             if nm_to_n(e.source()) is "frozencemetery" and a is "reload":
