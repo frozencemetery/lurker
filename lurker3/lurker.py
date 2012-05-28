@@ -24,3 +24,8 @@ def unload(modname):
     del moddict[modname]
     pass
   pass
+
+def reload(modname):
+  unload(modname)
+  load(modname)
+  pass
