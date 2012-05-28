@@ -5,6 +5,7 @@ import urllib2
 from module import *
 
 lastfmdict = "rsrc/lastfm.dict"
+
 f = open(lastfmdict, 'r')
 lookup = cPickle.load(f)
 f.close()
