@@ -8,3 +8,4 @@ userquit :: (channel name, quitter name)                             -> void
 botjoin  :: (channel name, bot name)                                 -> void
 botpart  :: (channel name, bot name)                                 -> void
 botquit  :: (bot name)                                               -> void
+unload   :: ()                                                       -> void
