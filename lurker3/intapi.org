@@ -1,7 +1,7 @@
 * submodules implement:
 cmdmsg   :: (channel socket, channel name, speaker name, cmd string) -> bool
 regmsg   :: (channel name, speaker name, reg string)                 -> void
-act      :: (channel name, speaker name, reg string)                 -> void
+action   :: (channel name, speaker name, reg string)                 -> void
 userjoin :: (channel name, joiner)                                   -> void
 userpart :: (channel name, parter name)                              -> void
 userquit :: (channel name, quitter name)                             -> void

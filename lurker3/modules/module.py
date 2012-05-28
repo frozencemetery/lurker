@@ -2,7 +2,7 @@ def cmdmsg(self, channel, channame, speaker, cmd):
   return False
 def regmsg(self, channame, speaker, msg):
   return
-def act(self, channame, speaker, msg):
+def action(self, channame, speaker, msg):
   return
 def userjoin(self, channame, joiner):
   return
