@@ -1,5 +1,8 @@
 import socket
+import ircutil
+import re
 
+MESSAGE = re.compile(ircutil.MESSAGE)
 class IrcError(Exception) :
     def __init__(self, value) :
         self.value = value
@@ -44,10 +47,19 @@ class IrcConnection(IrcListener) :
                 raise IrcError(e)
             lines = line_buffer.split('\r\n')
             for line in lines[:-1] :
-                self.interpret_line(line)
+                try :
+                    self.interpret_line(line + '\r\n')
+                except IrcError as ie :
+                    print ie
             line_buffer = lines[-1]
 
     def interpret_line(self, line) :
-        pass
-
-
+        line_match = re.match(MESSAGE, line)
+        if line_match :
+            prefix, command, params = line_match.groups()
+            self.process_command(command, prefix, params)
+        else :
+            raise IrcError("Invalid line: " + line)
+    
+    def process_command(self,command, prefix, params) :
+        print "Command:",command,"Prefix:",prefix,"Params",params
