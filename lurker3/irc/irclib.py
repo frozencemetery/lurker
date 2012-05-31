@@ -14,8 +14,8 @@ class IrcError(Exception) :
 
 # interface for listeners
 class IrcListener(object) : 
-    # called when someone sends a message aimed at us
-    def cmdmsg(self, sock, channel, sender, message) :
+    # called when someone sends us a private message
+    def on_priv_msg(self, sender, recipient, message) :
         pass
 
 # represents a connection to a single irc server. attach classes which 
@@ -76,8 +76,8 @@ class IrcConnection(IrcListener) :
         print "Command:",command,"Prefix:",prefix,"Params",params
 
     def add_listener(self, listener) :
-        print type(listener)
         assert(issubclass(type(listener),IrcListener))
+        self.OnMsg += listener
 
 # Default: if this was run on its own, connect to foonetic.net
 if __name__ == "__main__" :

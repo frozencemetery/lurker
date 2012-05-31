@@ -30,8 +30,9 @@ PARAMS = SPACE + "(?:" + MIDDLE + SPACE + ")*" + "(?::" + TRAILING + ")?"
 MESSAGE = "(?::" + "(" + PREFIX + ")" + SPACE + ")?" +\
           "(" + COMMAND + ")" +\
           "(" + PARAMS + ")" + CRLF
-
-# 
+PARAMGRP = SPACE + "(?:(" + MIDDLE + ")" + SPACE + ")*" + \
+           "(?::(" + TRAILING + "))?"
+# dictionary that stores keys in a case-insensitive manner 
 class UncasedDict :
     def __init__(self) :
         self.keyvals = []
