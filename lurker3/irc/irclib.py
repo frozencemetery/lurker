@@ -3,6 +3,7 @@ import ircutil
 import re
 
 MESSAGE = re.compile(ircutil.MESSAGE)
+PARAMGRP = re.compile(ircutil.PARAMGRP)
 
 # class for any kind of error we might run across
 class IrcError(Exception) :
@@ -16,6 +17,8 @@ class IrcError(Exception) :
 class IrcListener(object) : 
     # called when someone sends us a private message
     def on_priv_msg(self, sender, recipient, message) :
+        pass
+    def on_notice(self, sender, recipient, message) :
         pass
 
 # represents a connection to a single irc server. attach classes which 
@@ -67,17 +70,32 @@ class IrcConnection(IrcListener) :
         line_match = re.match(MESSAGE, line)
         if line_match :
             prefix, command, params = line_match.groups()
-            self.process_command(command, prefix, params)
+            try : 
+                self.process_command(command, prefix, params)
+            except IrcError as ie : 
+                raise ie
+            except : 
+                raise IrcError("Incorrect number of arguments: " +\
+                        ", ".join(params))
         else :
             raise IrcError("Invalid line: " + line)
     
     # evaluate a command. note that params begins with a space
     def process_command(self,command, prefix, params) :
         print "Command:",command,"Prefix:",prefix,"Params",params
+        paramlist = re.match(PARAMGRP, params)
+        print paramlist.groups()
+        if command.lower() == "privmsg" :
+            for l in self.OnMsg : l.on_priv_msg(prefix, params[0], params[1])
+        elif command.lower() == "notice" :
+            for l in self.OnMsg : l.on_notice(prefix, params[0], params[1])
+        else :
+            raise IrcError("Unknown command: " + str(command))
 
     def add_listener(self, listener) :
         assert(issubclass(type(listener),IrcListener))
-        self.OnMsg += listener
+        self.OnMsg.append(listener)
+
 
 # Default: if this was run on its own, connect to foonetic.net
 if __name__ == "__main__" :
