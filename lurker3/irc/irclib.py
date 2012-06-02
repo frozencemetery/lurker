@@ -1,4 +1,5 @@
 import socket
+import select
 import ircutil
 from ircutil import UncasedDict, IrcSender, wrap
 import re
@@ -42,10 +43,58 @@ class IrcListener(object) :
     def on_notice(self, owner, sender, recipient, message) :
         pass
 
+# manages all reads in a single non-blocking thread
+class SocketManager(threading.Thread) :
+    def __init__(self) :
+        self.sockets = {} # keys = sockets, vals = f()
+        self.queue = [] # keyval pairs
+        self.delqueue = [] # sockets to be removed
+        self.disconnect = False
+        threading.Thread.__init__(self)
+
+    def run(self) : 
+        while True :
+            readable, writable, error = select.select(self.sockets.keys(),[],[],0.1)
+            for sock in readable :
+                self.sockets[sock]()
+            while len(self.queue) > 0 :
+                self.sockets[self.queue[0][0]] = self.queue[0][1]
+                self.queue = self.queue[1:]
+            while len(self.delqueue) > 0 :
+                sock = self.delqueue[0]
+                self.delqueue = self.delqueue[1:]
+                if sock in self.sockets.keys() :
+                    del(self.sockets[sock])
+            if self.disconnect : 
+                return
+
+    @classmethod
+    def add(cls, sock, act) :
+        self = cls.singleton()
+        self.queue.append([sock,act])
+
+    @classmethod
+    def remove(cls, sock) :
+        self = cls.singleton()
+        self.delqueue.append(sock)
+        
+    @classmethod
+    def exit(cls) : 
+        cls.singleton().disconnect = True
+
+    @classmethod
+    def singleton(cls) :
+        try : 
+            return cls._singleton
+        except :
+            cls._singleton = cls()
+            cls._singleton.start()
+            return cls._singleton
+
 
 # represents a connection to a single irc server. attach classes which 
 #  implement IrcListener to make it do a thing
-class IrcConnection(IrcListener,threading.Thread) :
+class IrcConnection(IrcListener) :
     # these are mostly only here to keep track of them in ctags, not for any 
     # functional purpose.
     server = ""
@@ -57,6 +106,7 @@ class IrcConnection(IrcListener,threading.Thread) :
     Listeners = []
     socket = None
     send = None
+    _disconnect = False
     def __init__(self, server, port, nick="lurker",\
             user="lurker", realname="Helper P. Lurkington") :
         self.server = server
@@ -69,7 +119,6 @@ class IrcConnection(IrcListener,threading.Thread) :
         self.initialize_sender()
         self.initialize_listeners()
         self.add_listener(self)
-        threading.Thread.__init__(self)
 
     # make new listener queues
     def initialize_listeners(self) :
@@ -91,11 +140,15 @@ class IrcConnection(IrcListener,threading.Thread) :
         send.nick = lambda nick : \
                     send.multi("NICK",nick)
 
-    # connect to the specified server
-    def connect(self) :
-        self.start()
+    # disconnect
+    def disconnect(self) :
+        # exit gracefully TODO
+        debug("Disconnecting...")
+        SocketManager.remove(self.socket)
+        self._disconnect = True
+        self.socket.close()
 
-    def run(self) :
+    def connect(self) :
         verbose("Calling on_start")
         for l in self.Listeners : wrap(l.on_start,self)
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -107,19 +160,21 @@ class IrcConnection(IrcListener,threading.Thread) :
 
     # continually read lines until we get a newline.
     def start_recv_loop(self) :
-        line_buffer = ""
-        while True :
+        self.line_buffer = ""
+        SocketManager.add(self.socket, self.on_recv)
+
+    def on_recv(self) :
+        try :
+            self.line_buffer += self.socket.recv(256)
+        except Exception as e :
+            raise IrcError(e)
+        lines = self.line_buffer.split('\r\n')
+        for line in lines[:-1] :
             try :
-                line_buffer += self.socket.recv(256)
-            except Exception as e :
-                raise IrcError(e)
-            lines = line_buffer.split('\r\n')
-            for line in lines[:-1] :
-                try :
-                    self.interpret_line(line + '\r\n')
-                except IrcError as ie :
-                    warn("Caught",ie)
-            line_buffer = lines[-1]
+                self.interpret_line(line + '\r\n')
+            except IrcError as ie :
+                warn("Caught",ie)
+        self.line_buffer = lines[-1]
 
     # given a line, parse it into major tokens and process it, or throw an
     #  exception
@@ -199,7 +254,6 @@ if __name__ == "__main__" :
     conn = IrcConnection("irc.foonetic.net",6667,nick="lurker3",user="lurker3")
     conn.connect()
     stop = False
-    while not(stop) :
-        raw_input()
-    
-    #conn.disconnect()
+    raw_input()
+    conn.disconnect()
+    SocketManager.exit()

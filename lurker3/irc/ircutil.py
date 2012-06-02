@@ -1,8 +1,10 @@
-global __DEBUG, __VERBOSE, __SILENT, __WARN
+import sys
+global __DEBUG, __VERBOSE, __SILENT, __WARN, __FILE
 __DEBUG = False
 __VERBOSE = False
 __SILENT = False
 __WARN = False
+__FILE = sys.stdout
 # character classes expressions
 ALPHA = r"[a-zA-Z]"
 NUM = "[0-9]"
@@ -63,18 +65,25 @@ class IrcSender(object) :
     def __init__(self, owner) :
         self.owner = owner
 
+def output_to_stdout() :
+    __FILE = sys.stdout
+    
 def debug(*args) :
     if __DEBUG and not(__SILENT) :
-        print "[D] " + " ".join([str(arg) for arg in args])
+        __FILE.write( "[D] " + " ".join([str(arg) for arg in args]))
+        __FILE.write( "\n")
 def warn(*args) : 
     if __WARN and not (__SILENT) :
-        print "[W] " + " ".join([str(arg) for arg in args])
+        __FILE.write( "[W] " + " ".join([str(arg) for arg in args]))
+        __FILE.write( "\n")
 def verbose(*args) :
     if __VERBOSE and not(__SILENT) :
-        print "[V] " + " ".join([str(arg) for arg in args])
+        __FILE.write( "[V] " + " ".join([str(arg) for arg in args]))
+        __FILE.write( "\n")
 def prnt(*args) :
     if not(__SILENT) :
-        print "[N] " + " ".join([str(arg) for arg in args])
+        __FILE.write( "[N] " + " ".join([str(arg) for arg in args]))
+        __FILE.write( "\n")
 
 def wrap(fun, *args, **kwargs) :
     try :
