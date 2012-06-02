@@ -10,7 +10,9 @@ warn = ircutil.warn
 prnt = ircutil.prnt
 MESSAGE = re.compile(ircutil.MESSAGE)
 PARAMGRP = re.compile(ircutil.PARAMGRP)
+PREFIXGRP = re.compile(ircutil.PREFIXGRP)
 SPACE = re.compile(ircutil.SPACE)
+NICK = re.compile(ircutil.NICK)
 
 # class for any kind of error we might run across
 class IrcError(Exception) :
@@ -30,6 +32,18 @@ class IrcListener(object) :
     # called once we are connected to the irc server
     def on_connect(self, owner) :
         pass
+    # called when we can start doing things like join channel
+    def on_register(self, owner) :
+        pass
+    # called when a channel we in has a mode change
+    def on_chan_mode(self, owner, sender, channel, mode) :
+        pass
+    # called when someone joins a channel
+    def on_join(self, owner, sender, channel) :
+        pass
+    # called when someone sends us a notice
+    def on_notice(self, owner, sender, recipient, message) :
+        pass
     # any command that has a ### identifier (RPL_foo, ERR_foo, etc)
     def on_numeric_cmd(self, owner, sender, command, params) :
         pass
@@ -39,10 +53,13 @@ class IrcListener(object) :
     # called when someone sends us a private message
     def on_priv_msg(self, owner, sender, recipient, message) :
         pass
-    # called when someone sends us a notice
-    def on_notice(self, owner, sender, recipient, message) :
+    # called after we've registered with NICK and USER
+    def on_register(self, owner) :
         pass
-
+    # called when the server sets our mode to something
+    def on_user_mode(self, owner, sender, mode) :
+        pass
+    
 # manages all reads in a single non-blocking thread
 class SocketManager(threading.Thread) :
     def __init__(self) :
@@ -103,10 +120,12 @@ class IrcConnection(IrcListener) :
     nick = ""
     realname = ""
     connected = False
+    registered = False
     Listeners = []
     socket = None
     send = None
     _disconnect = False
+    
     def __init__(self, server, port, nick="lurker",\
             user="lurker", realname="Helper P. Lurkington") :
         self.server = server
@@ -115,6 +134,7 @@ class IrcConnection(IrcListener) :
         self.user = user
         self.realname = realname
         self.connected = False
+        self.registered = False
 
         self.initialize_sender()
         self.initialize_listeners()
@@ -135,10 +155,14 @@ class IrcConnection(IrcListener) :
                     send.multi("PONG",":"+cnt)
         send.privmsg = lambda dst, msg : \
                        send.multi("PRIVMSG",dst,":"+msg)
+        send.action = lambda dst, act: \
+                      send.privmsg(dst,chr(7)+"ACTION"+chr(7)+msg)
         send.user = lambda usr, mode, realname : \
                     send.multi("USER",usr,mode,"*",":"+realname)
         send.nick = lambda nick : \
                     send.multi("NICK",nick)
+        send.join = lambda chan, pw="" :\
+                    send.multi("JOIN",chan,pw)
 
     # disconnect
     def disconnect(self) :
@@ -207,19 +231,45 @@ class IrcConnection(IrcListener) :
             paramlist.append(paramgroups[1])
         debug("Parameters:",", ".join(str(p) for p in paramlist))
 
+        if prefix == None : 
+            server, nick, user, host = None, None, None, None
+            sender = ()
+        else :
+            server, nick, user, host = re.match(PREFIXGRP,prefix).groups()
+            if server == None :
+                sender = (nick, user, host)
+            else :
+                sender = (server,)
+        
         verbose("Command:",command)
-        if command.lower() == "privmsg" :
+        if command.isdigit() :
+            for l in self.Listeners : wrap(l.on_numeric_cmd,\
+                    self, sender, int(command), paramlist)
+        elif command.lower() == "privmsg" :
             for l in self.Listeners : wrap(l.on_priv_msg,\
-                    self, prefix, paramlist[0], paramlist[1])
+                    self, sender, paramlist[0], paramlist[1])
+        elif command.lower() == "mode" : 
+            # either a channel OR user mode
+            if re.match(NICK, paramlist[0]) :
+                if not(self.registered ) :
+                    self.registered = True
+                    debug("Calling on_register")
+                    for l in self.Listeners : wrap(l.on_register,\
+                            self)
+                for l in self.Listeners : wrap(l.on_user_mode,\
+                        self, sender, paramlist[1])
+            else :
+                for l in self.Listeners : wrap(l.on_chan_mode,\
+                        self, sender, paramlist[0], paramlist[1])
         elif command.lower() == "notice" :
             for l in self.Listeners : wrap(l.on_notice,\
-                    self, prefix, paramlist[0], paramlist[1])
-        elif command.isdigit() :
-            for l in self.Listeners : wrap(l.on_numeric_cmd,\
-                    self, prefix, int(command), paramlist)
+                    self, sender, paramlist[0], paramlist[1])
         elif command.lower() == "ping" :
             for l in self.Listeners : wrap(l.on_ping,\
-                    self, prefix, paramlist[0])
+                    self, sender, paramlist[0])
+        elif command.lower() == "join" :
+            for l in self.Listeners : wrap(l.on_join,\
+                    self, sender, paramlist[0])
         else :
             raise IrcError("Unknown command: " + str(command))
 
@@ -227,12 +277,16 @@ class IrcConnection(IrcListener) :
         assert(issubclass(type(listener),IrcListener))
         self.Listeners.append(listener)
 
+    # TODO: Move all these to "BasicBehavior"
     def on_connect(self, owner) :
         owner.send.user(self.user, 0, self.realname)
         owner.send.nick(self.nick)
 
     def on_ping(self, owner, sender, contents) :
         owner.send.pong(contents)
+
+    def on_register(self, owner) :
+        owner.send.join("#lurkertest")
 
 def set_debug(val): 
     ircutil.__DEBUG = val

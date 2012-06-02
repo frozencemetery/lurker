@@ -38,6 +38,9 @@ MESSAGE = "(?::" + "(" + PREFIX + ")" + SPACE + ")?" +\
           "(" + PARAMS + ")" + CRLF
 PARAMGRP = SPACE + "((?:" + MIDDLE + SPACE + ")*)" + \
            "(?::(" + TRAILING + "))?"
+PREFIXGRP = "(" + SERVERNAME + ")|(?:(" + NICK + \
+             ")(?:!(" + USER + ")@(" + HOST + "))?)"
+
 # dictionary that stores keys in a case-insensitive manner 
 class UncasedDict :
     def __init__(self) :
