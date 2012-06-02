@@ -1,4 +1,8 @@
-
+global __DEBUG, __VERBOSE, __SILENT, __WARN
+__DEBUG = False
+__VERBOSE = False
+__SILENT = False
+__WARN = False
 # character classes expressions
 ALPHA = r"[a-zA-Z]"
 NUM = "[0-9]"
@@ -30,7 +34,7 @@ PARAMS = SPACE + "(?:" + MIDDLE + SPACE + ")*" + "(?::" + TRAILING + ")?"
 MESSAGE = "(?::" + "(" + PREFIX + ")" + SPACE + ")?" +\
           "(" + COMMAND + ")" +\
           "(" + PARAMS + ")" + CRLF
-PARAMGRP = SPACE + "(?:(" + MIDDLE + ")" + SPACE + ")*" + \
+PARAMGRP = SPACE + "((?:" + MIDDLE + SPACE + ")*)" + \
            "(?::(" + TRAILING + "))?"
 # dictionary that stores keys in a case-insensitive manner 
 class UncasedDict :
@@ -53,3 +57,27 @@ class UncasedDict :
 
     def keys(self) :
         return [keyval[0] for keyval in self.keyvals]
+
+# nearly-empty class whose only purpose is to hold lambdas
+class IrcSender(object) :
+    def __init__(self, owner) :
+        self.owner = owner
+
+def debug(*args) :
+    if __DEBUG and not(__SILENT) :
+        print "[D] " + " ".join([str(arg) for arg in args])
+def warn(*args) : 
+    if __WARN and not (__SILENT) :
+        print "[W] " + " ".join([str(arg) for arg in args])
+def verbose(*args) :
+    if __VERBOSE and not(__SILENT) :
+        print "[V] " + " ".join([str(arg) for arg in args])
+def prnt(*args) :
+    if not(__SILENT) :
+        print "[N] " + " ".join([str(arg) for arg in args])
+
+def wrap(fun, *args, **kwargs) :
+    try :
+        fun(*args,**kwargs)
+    except Exception as e :
+        debug("Error in listener:",e)

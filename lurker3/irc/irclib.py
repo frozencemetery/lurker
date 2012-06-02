@@ -1,46 +1,103 @@
 import socket
 import ircutil
+from ircutil import UncasedDict, IrcSender, wrap
 import re
-
+import threading
+debug = ircutil.debug
+verbose = ircutil.verbose
+warn = ircutil.warn
+prnt = ircutil.prnt
 MESSAGE = re.compile(ircutil.MESSAGE)
 PARAMGRP = re.compile(ircutil.PARAMGRP)
+SPACE = re.compile(ircutil.SPACE)
 
 # class for any kind of error we might run across
 class IrcError(Exception) :
     def __init__(self, value) :
         self.value = value
-
     def __str__(self) :
-        return repr(self.value)
+        if issubclass(type(self.value),Exception) :
+            return type(self.value).__name__+": " + str(self.value)
+        else :
+            return str(self.value)
 
 # interface for listeners
 class IrcListener(object) : 
+    # called when the owner is created
+    def on_start(self, owner) : 
+        pass
+    # called once we are connected to the irc server
+    def on_connect(self, owner) :
+        pass
+    # any command that has a ### identifier (RPL_foo, ERR_foo, etc)
+    def on_numeric_cmd(self, owner, sender, command, params) :
+        pass
+    # called when we get a ping
+    def on_ping(self, owner, sender, contents) :
+        pass
     # called when someone sends us a private message
-    def on_priv_msg(self, sender, recipient, message) :
+    def on_priv_msg(self, owner, sender, recipient, message) :
         pass
-    def on_notice(self, sender, recipient, message) :
+    # called when someone sends us a notice
+    def on_notice(self, owner, sender, recipient, message) :
         pass
+
 
 # represents a connection to a single irc server. attach classes which 
 #  implement IrcListener to make it do a thing
-class IrcConnection(IrcListener) :
-    
+class IrcConnection(IrcListener,threading.Thread) :
+    # these are mostly only here to keep track of them in ctags, not for any 
+    # functional purpose.
+    server = ""
+    port = 0
+    user = ""
+    nick = ""
+    realname = ""
+    connected = False
+    Listeners = []
+    socket = None
+    send = None
     def __init__(self, server, port, nick="lurker",\
-            realname="Helper P. Lurkington") :
+            user="lurker", realname="Helper P. Lurkington") :
         self.server = server
         self.port = port
         self.nick = nick
+        self.user = user
         self.realname = realname
+        self.connected = False
 
+        self.initialize_sender()
         self.initialize_listeners()
         self.add_listener(self)
+        threading.Thread.__init__(self)
 
     # make new listener queues
     def initialize_listeners(self) :
-        self.OnMsg = []
+        self.Listeners = []
+
+    # make the send object
+    def initialize_sender(self) :
+        self.send = IrcSender(self)
+        send = self.send
+        send.raw = lambda msg : self.socket.send(msg + '\r\n')
+        send.multi = lambda *args : \
+                     send.raw(" ".join(str(arg) for arg in args))
+        send.pong = lambda cnt : \
+                    send.multi("PONG",":"+cnt)
+        send.privmsg = lambda dst, msg : \
+                       send.multi("PRIVMSG",dst,":"+msg)
+        send.user = lambda usr, mode, realname : \
+                    send.multi("USER",usr,mode,"*",":"+realname)
+        send.nick = lambda nick : \
+                    send.multi("NICK",nick)
 
     # connect to the specified server
     def connect(self) :
+        self.start()
+
+    def run(self) :
+        verbose("Calling on_start")
+        for l in self.Listeners : wrap(l.on_start,self)
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try : 
             self.socket.connect((self.server, self.port))
@@ -61,7 +118,7 @@ class IrcConnection(IrcListener) :
                 try :
                     self.interpret_line(line + '\r\n')
                 except IrcError as ie :
-                    print ie
+                    warn("Caught",ie)
             line_buffer = lines[-1]
 
     # given a line, parse it into major tokens and process it, or throw an
@@ -74,31 +131,75 @@ class IrcConnection(IrcListener) :
                 self.process_command(command, prefix, params)
             except IrcError as ie : 
                 raise ie
-            except : 
-                raise IrcError("Incorrect number of arguments: " +\
-                        ", ".join(params))
+            except Exception as e: 
+                raise IrcError(e)
         else :
             raise IrcError("Invalid line: " + line)
     
     # evaluate a command. note that params begins with a space
     def process_command(self,command, prefix, params) :
-        print "Command:",command,"Prefix:",prefix,"Params",params
-        paramlist = re.match(PARAMGRP, params)
-        print paramlist.groups()
+        if not(self.connected) :
+            self.connected = True
+            verbose("Calling on_connect")
+            for l in self.Listeners : wrap(l.on_connect,self)
+
+        debug("Command:",command,"Prefix:",prefix,"Params",params)
+        paramgroups = re.match(PARAMGRP, params).groups()
+        paramlist = []
+        if not(paramgroups[0] == None) : 
+            paramlist.extend(re.split(SPACE,paramgroups[0])[:-1])
+        if not(paramgroups[1] == None) :
+            paramlist.append(paramgroups[1])
+        debug("Parameters:",", ".join(str(p) for p in paramlist))
+
+        verbose("Command:",command)
         if command.lower() == "privmsg" :
-            for l in self.OnMsg : l.on_priv_msg(prefix, params[0], params[1])
+            for l in self.Listeners : wrap(l.on_priv_msg,\
+                    self, prefix, paramlist[0], paramlist[1])
         elif command.lower() == "notice" :
-            for l in self.OnMsg : l.on_notice(prefix, params[0], params[1])
+            for l in self.Listeners : wrap(l.on_notice,\
+                    self, prefix, paramlist[0], paramlist[1])
+        elif command.isdigit() :
+            for l in self.Listeners : wrap(l.on_numeric_cmd,\
+                    self, prefix, int(command), paramlist)
+        elif command.lower() == "ping" :
+            for l in self.Listeners : wrap(l.on_ping,\
+                    self, prefix, paramlist[0])
         else :
             raise IrcError("Unknown command: " + str(command))
 
     def add_listener(self, listener) :
         assert(issubclass(type(listener),IrcListener))
-        self.OnMsg.append(listener)
+        self.Listeners.append(listener)
 
+    def on_connect(self, owner) :
+        owner.send.user(self.user, 0, self.realname)
+        owner.send.nick(self.nick)
+
+    def on_ping(self, owner, sender, contents) :
+        owner.send.pong(contents)
+
+def set_debug(val): 
+    ircutil.__DEBUG = val
+
+def set_verbose(val) :
+    ircutil.__VERBOSE = val
+
+def set_warn(val) : 
+    ircutil.__WARN = val
+
+def set_silent(val) :
+    ircutil.__SILENT = val
 
 # Default: if this was run on its own, connect to foonetic.net
 if __name__ == "__main__" :
-    conn = IrcConnection("irc.foonetic.net",6667)
+    set_verbose(True)
+    set_debug(True)
+    set_warn(True)
+    conn = IrcConnection("irc.foonetic.net",6667,nick="lurker3",user="lurker3")
     conn.connect()
-
+    stop = False
+    while not(stop) :
+        raw_input()
+    
+    #conn.disconnect()
