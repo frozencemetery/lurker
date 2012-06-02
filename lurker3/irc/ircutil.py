@@ -63,6 +63,17 @@ class UncasedDict :
     def keys(self) :
         return [keyval[0] for keyval in self.keyvals]
 
+# class for any kind of error we might run across
+class IrcError(Exception) :
+    def __init__(self, value) :
+        self.value = value
+    def __str__(self) :
+        if issubclass(type(self.value),Exception) :
+            return type(self.value).__name__+": " + str(self.value)
+        else :
+            return str(self.value)
+
+
 # nearly-empty class whose only purpose is to hold lambdas
 class IrcSender(object) :
     def __init__(self, owner) :

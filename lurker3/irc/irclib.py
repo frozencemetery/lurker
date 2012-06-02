@@ -1,7 +1,7 @@
 import socket
 import select
 import ircutil
-from ircutil import UncasedDict, IrcSender, wrap
+from ircutil import UncasedDict, IrcSender, wrap, IrcError
 import re
 import threading
 debug = ircutil.debug
@@ -13,17 +13,6 @@ PARAMGRP = re.compile(ircutil.PARAMGRP)
 PREFIXGRP = re.compile(ircutil.PREFIXGRP)
 SPACE = re.compile(ircutil.SPACE)
 NICK = re.compile(ircutil.NICK)
-
-# class for any kind of error we might run across
-class IrcError(Exception) :
-    def __init__(self, value) :
-        self.value = value
-    def __str__(self) :
-        if issubclass(type(self.value),Exception) :
-            return type(self.value).__name__+": " + str(self.value)
-        else :
-            return str(self.value)
-
 # interface for listeners
 class IrcListener(object) : 
     # called when the owner is created
@@ -38,6 +27,9 @@ class IrcListener(object) :
     # called when a channel we in has a mode change
     def on_chan_mode(self, owner, sender, channel, mode) :
         pass
+    # called when someone sends a message to a channel we're in
+    def on_chan_msg(self, owner, sender, channel, message) :
+        pass
     # called when someone joins a channel
     def on_join(self, owner, sender, channel) :
         pass
@@ -51,7 +43,7 @@ class IrcListener(object) :
     def on_ping(self, owner, sender, contents) :
         pass
     # called when someone sends us a private message
-    def on_priv_msg(self, owner, sender, recipient, message) :
+    def on_priv_msg(self, owner, sender, message) :
         pass
     # called after we've registered with NICK and USER
     def on_register(self, owner) :
@@ -60,6 +52,17 @@ class IrcListener(object) :
     def on_user_mode(self, owner, sender, mode) :
         pass
     
+class BasicBehavior(IrcListener) :
+    def __init__(self, autochannels=["#lurkertest"]) :
+        # each element of autochannel should be a string name, or a 2-tuple of
+        # a name and password
+        self.autochannels = autochannels
+    def on_register(self, owner) :
+        for channel in self.autochannels : 
+            if type(channel) == str :
+                owner.send.join(channel)
+            else : 
+                owner.send.join(*channel) # unpacks arguments
 # manages all reads in a single non-blocking thread
 class SocketManager(threading.Thread) :
     def __init__(self) :
@@ -167,19 +170,22 @@ class IrcConnection(IrcListener) :
     # disconnect
     def disconnect(self) :
         # exit gracefully TODO
-        debug("Disconnecting...")
+        prnt("== Disconnecting from remote server %s..." % self.server)
         SocketManager.remove(self.socket)
         self._disconnect = True
         self.socket.close()
+        prnt("== Disconneced. Socket closed.")
 
     def connect(self) :
         verbose("Calling on_start")
         for l in self.Listeners : wrap(l.on_start,self)
+        prnt("== Connecting to remote server %s:%s..." % (self.server, self.port))
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try : 
             self.socket.connect((self.server, self.port))
         except Error as e :
             raise IrcError(e)
+        prnt("== Connection successful.")
         self.start_recv_loop()
 
     # continually read lines until we get a newline.
@@ -246,8 +252,13 @@ class IrcConnection(IrcListener) :
             for l in self.Listeners : wrap(l.on_numeric_cmd,\
                     self, sender, int(command), paramlist)
         elif command.lower() == "privmsg" :
-            for l in self.Listeners : wrap(l.on_priv_msg,\
-                    self, sender, paramlist[0], paramlist[1])
+            # either a channel OR personal message
+            if re.match(NICK, paramlist[0]) :
+                for l in self.Listeners : wrap(l.on_priv_msg,\
+                        self, sender, paramlist[1])
+            else :
+                for l in self.Listeners : wrap(l.on_chan_msg,\
+                        self, sender, paramlist[0], paramlist[1])
         elif command.lower() == "mode" : 
             # either a channel OR user mode
             if re.match(NICK, paramlist[0]) :
@@ -277,16 +288,12 @@ class IrcConnection(IrcListener) :
         assert(issubclass(type(listener),IrcListener))
         self.Listeners.append(listener)
 
-    # TODO: Move all these to "BasicBehavior"
     def on_connect(self, owner) :
         owner.send.user(self.user, 0, self.realname)
         owner.send.nick(self.nick)
 
     def on_ping(self, owner, sender, contents) :
         owner.send.pong(contents)
-
-    def on_register(self, owner) :
-        owner.send.join("#lurkertest")
 
 def set_debug(val): 
     ircutil.__DEBUG = val
@@ -306,6 +313,7 @@ if __name__ == "__main__" :
     set_debug(True)
     set_warn(True)
     conn = IrcConnection("irc.foonetic.net",6667,nick="lurker3",user="lurker3")
+    conn.add_listener(BasicBehavior(["#lurkertest"]))
     conn.connect()
     stop = False
     raw_input()
