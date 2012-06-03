@@ -5,6 +5,7 @@ __VERBOSE = False
 __SILENT = False
 __WARN = False
 __FILE = sys.stdout
+ACTION = chr(7) + "ACTION" + chr(7)
 # character classes expressions
 ALPHA = r"[a-zA-Z]"
 NUM = "[0-9]"
