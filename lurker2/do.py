@@ -172,6 +172,7 @@ def command(self, e, cmd, c, nick):
         pass
     elif cmd[:4] == "help":
         c.privmsg(channel, nick + ": https://paste.debian.net/plainh/47aa547e is the current version.  My BTS can be found at https://savannah.nongnu.org/bugs/?group=lurker")
+        executed = 1
         pass
     elif cmd == "hug me":
         executed = 1
