@@ -453,6 +453,10 @@ def command(self, e, cmd, c, nick):
         c.privmsg(channel, "notmuch.")
         executed = 1
         pass
+    elif cmd == "space":
+        c.privmsg(channel, "http://spaaaaaaaaaaaaaaaaaaaaaaaccee.com/")
+        executed = 1
+        pass
     elif len(cmd) <= 0:
         return
     if executed == 0:
