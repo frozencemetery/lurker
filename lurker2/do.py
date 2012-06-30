@@ -457,6 +457,62 @@ def command(self, e, cmd, c, nick):
         c.privmsg(channel, "http://spaaaaaaaaaaaaaaaaaaaaaaaccee.com/")
         executed = 1
         pass
+    elif cmd[:4] is "deal":
+        targets = cmd.split(" ", 5)[1:5]
+
+        import random
+        deck = []
+        for x in range(13):
+            deck.append((x+2, "S"))
+            deck.append((x+2, "H"))
+            deck.append((x+2, "D"))
+            deck.append((x+2, "C"))
+            pass
+        random.shuffle(deck)
+
+        def send_hand(target, cards):
+            clubs = []
+            diams = []
+            harts = []
+            spads = []
+            for x in cards:
+                if x[1] is "C": clubs.append(x[0])
+                elif x[1] is "D": diams.append(x[0])
+                elif x[1] is "H": harts.append(x[0])
+                elif x[1] is "S": spads.append(x[0])
+                pass
+            clubs.sort()
+            diams.sort()
+            harts.sort()
+            spads.sort()
+            
+            def make_suit(letter, suit_cards):
+                string = letter + ": "
+                for x in suit_cards:
+                    if x is 10: string += "T"
+                    elif x is 11: string += "J"
+                    elif x is 12: string += "Q"
+                    elif x is 13: string += "K"
+                    elif x is 14: string += "A"
+                    else: string += str(x)
+                    pass
+                string += "  "
+                return string
+            
+            clubs = make_suit("C", clubs)
+            diams = make_suit("D", diams)
+            harts = make_suit("H", harts)
+            spads = make_suit("S", spads)
+
+            c.privmsg(target, clubs + diams + harts + spads)
+
+            pass
+
+        for i in range(len(targets)):
+            send_hand(targets[i], deck[i*13:(i+1)*13])
+            pass
+
+        pass
     elif len(cmd) <= 0:
         return
     if executed == 0:
