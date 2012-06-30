@@ -476,10 +476,18 @@ def command(self, e, cmd, c, nick):
             harts = []
             spads = []
             for x in cards:
-                if x[1] is "C": clubs.append(x[0])
-                elif x[1] is "D": diams.append(x[0])
-                elif x[1] is "H": harts.append(x[0])
-                elif x[1] is "S": spads.append(x[0])
+                if x[1] is "C": 
+                    clubs.append(x[0])
+                    pass
+                elif x[1] is "D": 
+                    diams.append(x[0])
+                    pass
+                elif x[1] is "H": 
+                    harts.append(x[0])
+                    pass
+                elif x[1] is "S": 
+                    spads.append(x[0])
+                    pass
                 pass
             clubs.sort()
             diams.sort()
@@ -489,12 +497,24 @@ def command(self, e, cmd, c, nick):
             def make_suit(letter, suit_cards):
                 string = letter + ": "
                 for x in suit_cards:
-                    if x is 10: string += "T"
-                    elif x is 11: string += "J"
-                    elif x is 12: string += "Q"
-                    elif x is 13: string += "K"
-                    elif x is 14: string += "A"
-                    else: string += str(x)
+                    if x is 10: 
+                        string += "T"
+                        pass
+                    elif x is 11: 
+                        string += "J"
+                        pass
+                    elif x is 12: 
+                        string += "Q"
+                        pass
+                    elif x is 13: 
+                        string += "K"
+                        pass
+                    elif x is 14: 
+                        string += "A"
+                        pass
+                    else: 
+                        string += str(x)
+                        pass
                     pass
                 string += "  "
                 return string
@@ -511,7 +531,7 @@ def command(self, e, cmd, c, nick):
         for i in range(len(targets)):
             send_hand(targets[i], deck[i*13:(i+1)*13])
             pass
-
+        executed = 1
         pass
     elif len(cmd) <= 0:
         return
