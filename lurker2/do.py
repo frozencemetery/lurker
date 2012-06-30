@@ -457,7 +457,7 @@ def command(self, e, cmd, c, nick):
         c.privmsg(channel, "http://spaaaaaaaaaaaaaaaaaaaaaaaccee.com/")
         executed = 1
         pass
-    elif cmd[:4] is "deal":
+    elif cmd[:5] == "deal ":
         targets = cmd.split(" ", 5)[1:5]
 
         import random
