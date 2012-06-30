@@ -2,6 +2,8 @@
 - !roll <quantity>d<sides>[±<modifier>]: Rolls quantity dice of sides sides,
   and optionally adds or subtracts the modifier to the result.  Follows rules
   of D&D.
+- !deal [<user1> [<user2> [<user3> [<user4>]]]]: Deals a contact bridge hand
+  to users 1,2,3,and 4.
 - !help: Brings you here.
 - !hug me: Hugs the user.
 - !hug <target>: Hugs target in the current setting.
