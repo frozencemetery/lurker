@@ -491,8 +491,10 @@ def command(self, e, cmd, c, nick):
             m = response.read()
             stat = re.search("(?<=<h1>).*?(?=</h1>)", m).group(0)
             addi = re.search("(?<=<h2>).*?(?=</h2>)", m).group(0)
-            addi = addi.replace("<br/>", "")
+            addi = addi.replace("<br/>", " ")
             addi = addi.replace("&deg;", unichr(176).encode("latin-1"))
+            addi = addi.replace("<strong>", "")
+            addi = addi.replace("</string>", "")
             c.privmsg(channel, nick + ": " + stat + ".  Furthermore, " + addi)
             executed = 1
         except:
