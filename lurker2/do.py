@@ -495,6 +495,7 @@ def command(self, e, cmd, c, nick):
             addi = addi.replace("&deg;", unichr(176).encode("latin-1"))
             addi = addi.replace("<strong>", "")
             addi = addi.replace("</strong>", "")
+            addi[0] = 'c'
             c.privmsg(channel, nick + ": " + stat + ".  Furthermore, " + addi)
             executed = 1
         except:
