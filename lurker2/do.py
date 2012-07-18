@@ -457,6 +457,47 @@ def command(self, e, cmd, c, nick):
         c.privmsg(channel, "http://spaaaaaaaaaaaaaaaaaaaaaaaccee.com/")
         executed = 1
         pass
+    elif cmd == "rain":
+        try:
+            import urllib2
+            import re
+            import cPickle
+            url = "http://isitraining.in/"
+            ref = "rsrc/tfw.dict"
+            cmd = cmd.split(" ", 1)
+            try:
+                cmd = cmd[1]
+                if cmd[:4] == "set ":
+                    cmd = cmd.split(" ", 1)[1]
+                    fw = open(ref, "r")
+                    bill = cPickle.load(fw)
+                    fw.close()
+                    bill[nick] = cmd
+                    fw = open(ref, "w")
+                    cPickle.dump(bill, fw)
+                    fw.close()
+                    pass
+                pass
+            except:
+                fw = open(ref, "r")
+                bill = cPickle.load(fw)
+                fw.close()
+                cmd = bill[nick]
+                pass
+            cmd = urllib2.quote(cmd)
+            url = url + cmd
+            import urllib2
+            response = urllib2.urlopen(url)
+            m = response.read()
+            stat = re.search("(?<=<h1>).*?(?=</h1>)", m).group(0)
+            addi = re.search("(?<=<h2>).*?(?=</h2>)", m).group(0)
+            addi = addi.replace("<br/>", "")
+            addi = addi.replace("&deg;", "°")
+            c.privmsg(channel, nick + ": " + stat + ".  Furthermore, " + addi)
+            executed = 1
+        except:
+            c.privmsg("Fuck you and fuck your horse.")
+            pass
     elif cmd[:5] == "deal ":
         targets = cmd.split(" ", 5)[1:5]
 
