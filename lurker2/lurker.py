@@ -36,11 +36,11 @@ class TestBot(SingleServerIRCBot):
         outref = "rsrc/alerts.db"
         alpha = open(outref, 'r')
         beta = ""
-        nick = lower(nm_to_n(e.source()))
+        nick = nm_to_n(e.source()).lower()
         for line in alpha:
             try:
                 linebeta = line.split(" ", 2)
-                if lower(linebeta[1]) == nick:
+                if linebeta[1].lower() == nick:
                     c.privmsg(nick, linebeta[0] + " told me to tell you " + linebeta[2])
                     pass
                 else:
