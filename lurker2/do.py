@@ -170,8 +170,8 @@ def command(self, e, cmd, c, nick):
                 pass
             pass
         pass
-    elif cmd[:4] == "help":
-        c.privmsg(channel, nick + ": http://hg.savannah.gnu.org/hgweb/lurker/file/dd9e8a305b69/api.org is the current version.  My BTS can be found at https://savannah.nongnu.org/bugs/?group=lurker")
+    elif cmd[:4] == "help" or cmd[:6] == "source":
+        c.privmsg(channel, nick + ": https://github.com/frozencemetery/lurker/blob/master/api.org is the current version.  My BTS, source, and other things can be found at https://github.com/frozencemetery/lurker")
         executed = 1
         pass
     elif cmd == "hug me":
@@ -377,10 +377,6 @@ def command(self, e, cmd, c, nick):
         stof.close()
         finalline = "NOW WE'RE HAVING A GOOD TIME RIGHT"
         c.privmsg(channel, finalline)
-        executed = 1
-        pass
-    elif cmd[:6] == "source":
-        c.privmsg(channel, nick + ": You can find my source at https://savannah.nongnu.org/projects/lurker and BTS at https://savannah.nongnu.org/bugs/?group=lurker")
         executed = 1
         pass
     elif cmd[:2] == "q " or cmd[:4] == "ddg " or cmd[:6] == "quack ":
