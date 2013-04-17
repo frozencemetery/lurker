@@ -423,6 +423,7 @@ def command(self, e, cmd, c, nick):
         except:
             c.privmsg(channel, "noep.")
             pass
+        executed = 1
         pass
     elif cmd == "sup":
         c.privmsg(channel, "notmuch.")
