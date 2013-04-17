@@ -404,7 +404,7 @@ def command(self, e, cmd, c, nick):
         import urllib2
         import re
         try:
-            m = urllib2.urlopen(url).read()
+            m = urllib2.urlopen(url).read().replace('\n', '')
             first = re.search("(?<=class=\"even\">).*?</tr>", m).group(0)
             info = re.findall("(?<=<td>).*?(?=</td>)", first)
             
