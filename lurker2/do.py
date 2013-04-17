@@ -418,7 +418,7 @@ def command(self, e, cmd, c, nick):
                 album = ""
                 pass
             
-            response = artist + " - \"" + track + album + "(" + time + ")"
+            response = artist + " - \"" + track + album + " (" + time + ")"
             c.privmsg(channel, nick + ": " + response)
         except:
             c.privmsg(channel, "noep.")
