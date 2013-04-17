@@ -400,47 +400,26 @@ def command(self, e, cmd, c, nick):
         executed = 1
         pass
     elif cmd[:8] == "lantunes" or cmd[:2] == "lt":
-        url = "http://music.furstlabs.com"
+        url = "http://music.furstlabs.com/queue"
         import urllib2
         import re
-        response = urllib2.urlopen(url)
-        m = response.read() 
-        m = m.replace('\n', '')
-        junk = re.search("(?<=<tr id=).*?(?=</tr>)", m).group(0)
         try:
-            rest = re.findall("(?<=<td>).*?(?=</td>)", junk)
-            title = '"' + rest[0] + '"'
+            m = urllib2.urlopen(url).read()
+            first = re.search("(?<=class=\"even\">).*?</tr>", m).group(0)
+            info = re.findall("(?<=<td>).*?(?=</td>)", first)
             
-            artist = ""
-            try:
-                artist = rest[1]
-                if artist == "N/A":
-                    artist = ""
-                    pass
-                else:
-                    artist = " by " + artist
-                    pass
+            track = info[0]
+            artist = info[1]
+            time = info[-2]
+            if len(info) >= 5:
+                album = " [" + info[2] + "]"
                 pass
-            except:
+            else:
+                album = ""
                 pass
-
-            time = ""
-            try:
-                time = rest[3]
-                if time == "N/A":
-                    time = ""
-                    pass
-                else:
-                    time = ' (' + time + ')'
-                    pass
-                pass
-            except:
-                pass
-
-            final = title + artist + time
-            c.privmsg(channel, final)
-            executed = 1
-            pass
+            
+            response = artist + " - \"" + track + album + "(" + time + ")"
+            c.privmsg(channel, nick + ": " + response)
         except:
             c.privmsg(channel, "noep.")
             pass
