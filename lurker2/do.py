@@ -352,24 +352,15 @@ def command(self, e, cmd, c, nick):
     executed = 1
     pass
   elif cmd == "convo":
-    stof = "rsrc/convo.db"
-    read = open(stof, 'r')
-    linecount = 0
-    for line in read:
-      linecount += 1
-      pass
-    read.close()
-    choice = random.randint(0, linecount-1)
-    read = open(stof, 'r')
-    finalline = ""
-    for line in read:
-      if choice == 0:
-        finalline = line
+    stored = ""
+    with open("rsrc/convo.db", "r") as f:
+      for i,line in enumerate(f):
+        if random.random() < (1.0/(i+1)):
+          stored = line
+          pass
         pass
-      choice -= 1
       pass
-    read.close()
-    c.privmsg(channel, finalline)
+    c.privmsg(channel, stored) 
     executed = 1
     pass
   elif cmd.startswith("convo add "):
@@ -401,28 +392,43 @@ def command(self, e, cmd, c, nick):
     executed = 1
     pass
   elif cmd.startswith("lantunes") or cmd.startswith("lt"):
-    url = "http://music.furstlabs.com/queue"
-    try:
-      m = urllib2.urlopen(url).read().replace('\n', '')
-      first = re.search("(?<=class=\"even\">).*?</tr>", m).group(0)
-      info = re.findall("(?<=<td>).*?(?=</td>)", first)
-      
-      track = unhtml(info[0])
-      artist = unhtml(info[1])
-      time = unhtml(info[-2])
-      if len(info) >= 5:
-        album = unhtml(" [" + info[2] + "]")
+    parts = cmd.strip().split(" ",1)
+    url = "http://music.furstlabs.com/"
+    if len(parts) == 1:
+      url += "queue"
+      try:
+        m = urllib2.urlopen(url).read().replace('\n', '')
+        first = re.search("(?<=class=\"even\">).*?</tr>", m).group(0)
+        info = re.findall("(?<=<td>).*?(?=</td>)", first)
+        
+        track = unhtml(info[0])
+        artist = unhtml(info[1])
+        time = unhtml(info[-2])
+        if len(info) >= 5:
+          album = unhtml(" [" + info[2] + "]")
+          pass
+        else:
+          album = ""
+          pass
+
+        response = artist + " - \"" + track + "\"" + album + " (" + time + ")"
+        c.privmsg(channel, nick + ": " + response)
+        executed = 1
+      except:
         pass
-      else:
-        album = ""
-        pass
-      
-      response = artist + " - \"" + track + "\"" + album + " (" + time + ")"
-      c.privmsg(channel, nick + ": " + response)
-    except:
-      c.privmsg(channel, "noep.")
       pass
-    executed = 1
+    else:
+      url += "submit"
+      try:
+        m = urllib2.urlopen(url, "uri="+urllib2.quote(parts[1]))
+        m.read()
+        c.privmsg(channel, "Queued to lantunes.")
+        pass
+      except:
+        c.privmsg(channel, "Failed to queue to lantunes.")
+        pass
+      executed = 1
+      pass
     pass
   elif cmd == "sup":
     c.privmsg(channel, "notmuch.")

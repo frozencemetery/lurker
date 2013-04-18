@@ -172,8 +172,8 @@ class TestBot(SingleServerIRCBot):
       try:
         do.command(self, e, cmd, c, nick)
         pass
-      except:
-        pass
+      except Exception as e:
+        print e
       pass
     pass
   
