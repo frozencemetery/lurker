@@ -21,6 +21,8 @@
 #     re.search("(?<=" + nick + " \().*?(?=\) joined)", bluh).group(0)
 # Note that this isn't a good whois because it's first only
 
+import math
+
 def coff(f): # moderately naive method to get celsius from fahrenheit
     return (int((f-32)*(500.0)/(9.0)))/100.0
 
@@ -130,7 +132,7 @@ def command(self, e, cmd, c, nick):
             if len(t) != 2:
                 c.privmsg(channel, "Syntax is: \"roll xdy[\xc2z]\".")
                 pass
-            else :
+            else:
                 testa = t[1].split("+", 1) #
                 testb = t[1].split("-", 1) #
                 if len(testa[0]) > len(testb[0]):
@@ -154,14 +156,19 @@ def command(self, e, cmd, c, nick):
                 if sidenum < 2:
                     counter = numtoroll
                     pass
-                else :
-                    counter, i = 0, 0
-                    while i < numtoroll:
-                        roll = random.randint(1, sidenum);
-                        counter = counter + roll;
-                        i = i + 1;
-                        pass
-                    pass
+                else:
+                    if numtoroll <= 1000:
+                        counter, i = 0, 0
+                        while i < numtoroll:
+                            roll = random.randint(1, sidenum);
+                            counter = counter + roll;
+                            i = i + 1;
+                    else:
+                        # approximate with Gaussian
+                        counter = int(round(random.gauss(
+                                    numtoroll*(sidenum+1)/2.0, 
+                                    math.sqrt(
+                                        numtoroll*(sidenum**2 - 1)/12.0))))
                 counter = counter + bonus
                 if nick != "robbie" and channel == nick:
                     c.privmsg("robbie", "I rolled : " + str(counter) + " for " + nick + ".")
