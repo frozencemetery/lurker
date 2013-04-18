@@ -35,12 +35,12 @@ def command(self, e, cmd, c, nick):
         channel = nick
         pass
     if nick == "frozencemetery": # my commands.
-        if cmd[:5] == "nick ":
+        if cmd.startswith("nick "):
             cmd = cmd.split(" ", 1)[1]
             c.nick(cmd)
             executed = 1
             pass
-        elif cmd[:9] == "sendroll ":
+        elif cmd.startswith("sendroll "):
             executed = 1
             s = cmd.split(" ", 2)
             if len(s) != 3:
@@ -53,7 +53,7 @@ def command(self, e, cmd, c, nick):
                     c.privmsg(nick, "Parsing error on token: " + cmd)
                     f.write("Parsing error on token: " + cmd)
                     pass
-                else :
+                else:
                     testa = t[1].split("+", 1) #
                     testb = t[1].split("-", 1) #
                     if len(testa[0]) > len(testb[0]):
@@ -102,25 +102,25 @@ def command(self, e, cmd, c, nick):
             self.die()
             executed = 1
             pass
-        elif cmd[:4] == "join":
+        elif cmd.startswith("join"):
             z = cmd.split(" ", 1) 
             disp = z[1].split(" ", 1) 
             c.join(z[1])
             executed = 1
             pass
-        elif cmd[:3] == "say":
+        elif cmd.startswith("say"):
             z = cmd.split(" ", 2)
             c.privmsg(z[1], z[2])
             executed = 1
             pass
-        elif cmd[:6] == "action":
+        elif cmd.startswith("action"):
             z=cmd.split(" ", 2) 
             c.action(z[1], z[2])
             executed = 1
             pass
         pass
     # commands for all
-    if cmd[:4] == "roll": 
+    if cmd.startswith("roll"): 
         executed = 1
         s = cmd.split(" ", 1) 
         if len(s) != 2:
@@ -177,7 +177,7 @@ def command(self, e, cmd, c, nick):
                 pass
             pass
         pass
-    elif cmd[:4] == "help" or cmd[:6] == "source":
+    elif cmd.startswith("help") or cmd.startswith("source"):
         c.privmsg(channel, nick + ": https://github.com/frozencemetery/lurker/blob/master/api.org is the current version.  My BTS, source, and other things can be found at https://github.com/frozencemetery/lurker")
         executed = 1
         pass
@@ -185,12 +185,12 @@ def command(self, e, cmd, c, nick):
         executed = 1
         c.action(channel, "hugs " + nick + ".")
         pass
-    elif cmd[:4] == "hug ":
+    elif cmd.startswith("hug "):
         executed = 1
         name = cmd.split(" ", 1)[1]
         c.action(channel, "hugs " + name + ".")
         pass
-    elif cmd[:3] == "fml":
+    elif cmd.startswith("fml"):
         response = urllib2.urlopen('http://www.fmylife.com/random')
         html = response.read()
         html = html.replace("Today and ends with FML", "")
@@ -204,7 +204,7 @@ def command(self, e, cmd, c, nick):
         c.privmsg(channel, nick + ": " + res)
         executed = 1
         pass
-    elif cmd[:2]== "fm" or cmd[:2] == "np":
+    elif cmd.startswith("fm") or cmd.startswith("np"):
         cmd = cmd.split(" ", 1)
         try:
             cmd = cmd[1]
@@ -246,7 +246,7 @@ def command(self, e, cmd, c, nick):
         c.privmsg(channel, nick + ": " + ct)
         executed = 1
         pass
-    elif cmd[:2] == "fw":
+    elif cmd.startswith("fw"):
         try:
             url = "http://thefuckingweather.com/?where="
             ref = "rsrc/tfw.dict"
@@ -318,7 +318,7 @@ def command(self, e, cmd, c, nick):
             pass
         executed = 1
         pass
-    elif cmd[:6] == "alert ":
+    elif cmd.startswith("alert "):
         stof = "rsrc/alerts.db"
         read = open(stof, "a")
         cmd = e.source() + " " + cmd.split(" ", 1)[1] 
@@ -331,7 +331,7 @@ def command(self, e, cmd, c, nick):
         c.privmsg(channel, "Reminder saved.")
         executed = 1
         pass
-    elif cmd[:10] == "anonalert ":
+    elif cmd.startswith("anonalert "):
         stof = "rsrc/alerts.db"
         read = open(stof, "a")
         cmd = "<anonymous_user> " + cmd.split(" ", 1)[1]
@@ -365,7 +365,7 @@ def command(self, e, cmd, c, nick):
         c.privmsg(channel, finalline)
         executed = 1
         pass
-    elif cmd[:10] == "convo add ":
+    elif cmd.startswith("convo add "):
         cmd = cmd.split(" ", 2)[2]
         stof = open("rsrc/convo.db", 'a')
         stof.write(cmd + '\n')
@@ -374,18 +374,18 @@ def command(self, e, cmd, c, nick):
         c.privmsg(channel, finalline)
         executed = 1
         pass
-    elif cmd[:2] == "q " or cmd[:4] == "ddg " or cmd[:6] == "quack ":
+    elif cmd.startswith("q ") or cmd.startswith("ddg ") or cmd.startswith("ddg ") or cmd.startswith("quack "):
         cmd = cmd.split(" ", 1)[1]
         url = "https://duckduckgo.com/html?kp=-1&q="
         beep = urllib.quote_plus(cmd)
         c.privmsg(channel, nick + ": " + url + beep)
         executed = 1
         pass
-    elif cmd[:4] == "test":
+    elif cmd.startswith("test"):
         c.privmsg(channel, nick + ": blargl")
         executed = 1
         pass
-    elif cmd[:4] == "ping":
+    elif cmd.startswith("ping"):
         c.action(channel, "squeaks at " + nick)
         executed = 1
         pass
@@ -393,7 +393,7 @@ def command(self, e, cmd, c, nick):
         c.action(channel, "ssssssssssssSSSSSSSSSSSSHHHHHHHHHHHHHHHHHHHHHHHHHHHHHhsssssssssssssssssssss")
         executed = 1
         pass
-    elif cmd[:8] == "lantunes" or cmd[:2] == "lt":
+    elif cmd.startswith("lantunes") or cmd.startswith("lt"):
         url = "http://music.furstlabs.com/queue"
         try:
             m = urllib2.urlopen(url).read().replace('\n', '')
@@ -465,7 +465,7 @@ def command(self, e, cmd, c, nick):
         except:
             c.privmsg("Fuck you and fuck your horse.")
             pass
-    elif cmd[:5] == "deal ":
+    elif cmd.startswith("deal "):
         targets = cmd.split(" ", 5)[1:5]
 
         deck = []
