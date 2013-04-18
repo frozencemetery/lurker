@@ -194,15 +194,28 @@ def command(self, e, cmd, c, nick):
     c.privmsg(channel, nick + ": https://github.com/frozencemetery/lurker/blob/master/api.org is the current version.  My BTS, source, and other things can be found at https://github.com/frozencemetery/lurker")
     executed = 1
     pass
-  elif cmd == "hug me":
-    executed = 1
-    c.action(channel, "hugs " + nick + ".")
-    pass
   elif cmd.startswith("hug "):
     executed = 1
-    name = cmd.split(" ", 1)[1]
-    c.action(channel, "hugs " + name + ".")
-    pass
+    name = cmd.split(" ",1)[1]
+    nohugs_file = "rsrc/nohugs.db"
+    def load_hugs():
+        return cPickle.load(open(nohugs_file, "r"))
+    def write_hugs(ns):
+        cPickle.dump(ns, open(nohugs_file, "w"))
+        return ns
+    try:
+        ns = load_hugs()
+    except IOError:
+        ns = write_hugs(frozenset())
+    if name == "me never":
+        write_hugs(ns | frozenset([nick]))
+    else:
+        if name == "me":
+            name = nick
+        if name not in ns:
+            c.action(channel, "hugs {0}.".format(name))
+        else:
+            c.action(channel, "refuses to violate {0}.".format(name))
   elif cmd.startswith("fml"):
     response = urllib2.urlopen('http://www.fmylife.com/random')
     html = response.read()
