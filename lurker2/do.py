@@ -195,27 +195,35 @@ def command(self, e, cmd, c, nick):
     executed = 1
     pass
   elif cmd.startswith("hug "):
-    executed = 1
     name = cmd.split(" ",1)[1]
     nohugs_file = "rsrc/nohugs.db"
     def load_hugs():
-        return cPickle.load(open(nohugs_file, "r"))
+      return cPickle.load(open(nohugs_file, "r"))
     def write_hugs(ns):
-        cPickle.dump(ns, open(nohugs_file, "w"))
-        return ns
+      cPickle.dump(ns, open(nohugs_file, "w"))
+      return ns
     try:
-        ns = load_hugs()
+      ns = load_hugs()
+      pass
     except IOError:
-        ns = write_hugs(frozenset())
+      ns = write_hugs(frozenset())
     if name == "me never":
-        write_hugs(ns | frozenset([nick]))
+      write_hugs(ns | frozenset([nick]))
+      c.privmsg(channel, name + ": I will remember that")
+      pass
     else:
-        if name == "me":
-            name = nick
-        if name not in ns:
-            c.action(channel, "hugs {0}.".format(name))
-        else:
-            c.action(channel, "refuses to violate {0}.".format(name))
+      if name == "me":
+        name = nick
+        pass
+      if name not in ns:
+        c.action(channel, "hugs {0}.".format(name))
+        pass
+      else:
+        c.action(channel, "refuses to violate {0}.".format(name))
+        pass
+      pass
+    executed = 1
+    pass
   elif cmd.startswith("fml"):
     response = urllib2.urlopen('http://www.fmylife.com/random')
     html = response.read()
