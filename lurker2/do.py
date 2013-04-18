@@ -209,7 +209,7 @@ def command(self, e, cmd, c, nick):
       ns = write_hugs(frozenset())
     if name == "me never":
       write_hugs(ns | frozenset([nick]))
-      c.privmsg(channel, name + ": I will remember that")
+      c.privmsg(channel, nick + ": I will remember that")
       pass
     else:
       if name == "me":
