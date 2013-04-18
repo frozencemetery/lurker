@@ -41,7 +41,8 @@ def unhtml(m):
 def command(self, e, cmd, c, nick):
   executed = 0
   channel = e.target()
-  if channel[:1] != "#" and channel[:1] != "&" and channel[:1] != "+" and channel[:1] != "!": # checking for private queries and responding accordingly
+  if channel[:1] != "#" and channel[:1] != "&" and channel[:1] != "+" and channel[:1] != "!":
+    # checking for private queries and responding accordingly
     channel = nick
     pass
   if nick == "frozencemetery": # my commands.
@@ -87,16 +88,16 @@ def command(self, e, cmd, c, nick):
           if sidenum <2:
             counter = numtoroll
             pass
-          else :
+          else:
             counter, i = 0, 0
             while i < numtoroll:
-              roll = random.randint(1, sidenum);
-              counter = counter + roll;
-              i = i + 1;
+              roll = random.randint(1, sidenum)
+              counter = counter + roll
+              i = i + 1
               pass
             pass
           counter = counter + bonus
-          c.privmsg(s[1], nick + " rolled a " +str(counter))
+          c.privmsg(s[1], nick + " rolled a " + str(counter))
           pass
         pass
       pass
@@ -170,15 +171,17 @@ def command(self, e, cmd, c, nick):
           if numtoroll <= 1000:
             counter, i = 0, 0
             while i < numtoroll:
-              roll = random.randint(1, sidenum);
-              counter = counter + roll;
-              i = i + 1;
+              roll = random.randint(1, sidenum)
+              counter = counter + roll
+              i = i + 1
+              pass
+            pass
           else:
             # approximate with Gaussian
             counter = int(round(random.gauss(
-                  numtoroll*(sidenum+1)/2.0, 
-                  math.sqrt(
-                    numtoroll*(sidenum**2 - 1)/12.0))))
+                  numtoroll*(sidenum+1)/2.0,
+                  math.sqrt(numtoroll*(sidenum**2 - 1)/12.0))))
+            pass
         counter = counter + bonus
         if nick != "robbie" and channel == nick:
           c.privmsg("robbie", "I rolled : " + str(counter) + " for " + nick + ".")
