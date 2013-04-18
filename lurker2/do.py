@@ -17,11 +17,13 @@
     # along with lurker.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# to find the first instance of a hostmask:
-#     re.search("(?<=" + nick + " \().*?(?=\) joined)", bluh).group(0)
-# Note that this isn't a good whois because it's first only
-
 import math
+import random
+import urllib
+import urllib2
+import re
+import cPickle
+import time
 
 def coff(f): # moderately naive method to get celsius from fahrenheit
     return (int((f-32)*(500.0)/(9.0)))/100.0
@@ -40,7 +42,6 @@ def command(self, e, cmd, c, nick):
             pass
         elif cmd[:9] == "sendroll ":
             executed = 1
-            import random
             s = cmd.split(" ", 2)
             if len(s) != 3:
                 c.privmsg(nick, "Parsing error on token: " + cmd)
@@ -121,7 +122,6 @@ def command(self, e, cmd, c, nick):
     # commands for all
     if cmd[:4] == "roll": 
         executed = 1
-        import random
         s = cmd.split(" ", 1) 
         if len(s) != 2:
             c.privmsg(channel, "Syntax is: \"roll xdy[\xc2z]\".")
@@ -191,8 +191,6 @@ def command(self, e, cmd, c, nick):
         c.action(channel, "hugs " + name + ".")
         pass
     elif cmd[:3] == "fml":
-        import urllib2
-        import re
         response = urllib2.urlopen('http://www.fmylife.com/random')
         html = response.read()
         html = html.replace("Today and ends with FML", "")
@@ -207,9 +205,6 @@ def command(self, e, cmd, c, nick):
         executed = 1
         pass
     elif cmd[:2]== "fm" or cmd[:2] == "np":
-        import urllib2
-        import re
-        import cPickle
         cmd = cmd.split(" ", 1)
         try:
             cmd = cmd[1]
@@ -253,9 +248,6 @@ def command(self, e, cmd, c, nick):
         pass
     elif cmd[:2] == "fw":
         try:
-            import urllib2
-            import re
-            import cPickle
             url = "http://thefuckingweather.com/?where="
             ref = "rsrc/tfw.dict"
             cmd = cmd.split(" ", 1)
@@ -280,7 +272,6 @@ def command(self, e, cmd, c, nick):
                 pass
             cmd = urllib2.quote(cmd)
             url = url + cmd
-            import urllib2
             response = urllib2.urlopen(url)
             m = response.read()
             temp = int(re.search("(?<=<span class=\"temperature\" tempf=\").*?(?=\">)", m).group(0))
@@ -308,7 +299,6 @@ def command(self, e, cmd, c, nick):
 
             magic = "\x02" + location + "\x0F: " + str(temp) + " F (" + str(coff(temp)) + " C) | " + status + " (" + paren + ") | " + daya + ": High " + str(tempha) + " F (" + str(coff(tempha)) + " C), Low " + str(templa) + " F (" + str(coff(templa)) + " C).  " + fca + " | " + dayb + ": High " + str(temphb) + " F (" + str(coff(temphb)) + " C), Low " + str(templb) + " F (" + str(coff(templb)) + " C).  " + fcb
             magic = magic.replace("ITS", "IT'S")
-            import random
             switch = random.randint(1,30)
             if switch == 1:
                 c.privmsg(channel, "IT'S RAINING MEN")
@@ -329,7 +319,6 @@ def command(self, e, cmd, c, nick):
         executed = 1
         pass
     elif cmd[:6] == "alert ":
-        import time
         stof = "rsrc/alerts.db"
         read = open(stof, "a")
         cmd = e.source() + " " + cmd.split(" ", 1)[1] 
@@ -356,7 +345,6 @@ def command(self, e, cmd, c, nick):
         executed = 1
         pass
     elif cmd == "convo":
-        import random
         stof = "rsrc/convo.db"
         read = open(stof, 'r')
         linecount = 0
@@ -389,7 +377,6 @@ def command(self, e, cmd, c, nick):
     elif cmd[:2] == "q " or cmd[:4] == "ddg " or cmd[:6] == "quack ":
         cmd = cmd.split(" ", 1)[1]
         url = "https://duckduckgo.com/html?kp=-1&q="
-        import urllib
         beep = urllib.quote_plus(cmd)
         c.privmsg(channel, nick + ": " + url + beep)
         executed = 1
@@ -408,8 +395,6 @@ def command(self, e, cmd, c, nick):
         pass
     elif cmd[:8] == "lantunes" or cmd[:2] == "lt":
         url = "http://music.furstlabs.com/queue"
-        import urllib2
-        import re
         try:
             m = urllib2.urlopen(url).read().replace('\n', '')
             first = re.search("(?<=class=\"even\">).*?</tr>", m).group(0)
@@ -442,9 +427,6 @@ def command(self, e, cmd, c, nick):
         pass
     elif cmd == "rain":
         try:
-            import urllib2
-            import re
-            import cPickle
             url = "http://isitraining.in/"
             ref = "rsrc/tfw.dict"
             cmd = cmd.split(" ", 1)
@@ -469,7 +451,6 @@ def command(self, e, cmd, c, nick):
                 pass
             cmd = urllib2.quote(cmd)
             url = url + cmd
-            import urllib2
             response = urllib2.urlopen(url)
             m = response.read()
             stat = re.search("(?<=<h1>).*?(?=</h1>)", m).group(0)
@@ -487,7 +468,6 @@ def command(self, e, cmd, c, nick):
     elif cmd[:5] == "deal ":
         targets = cmd.split(" ", 5)[1:5]
 
-        import random
         deck = []
         for x in range(13):
             deck.append((x+2, "S"))
