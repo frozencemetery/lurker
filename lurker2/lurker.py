@@ -147,10 +147,6 @@ class TestBot(SingleServerIRCBot):
       pass
     alpha.close()
 
-    if a == "sup" or a == "sup." or a == "sup?":
-      c.privmsg(e.target(), "notmuch")
-      pass
-
     alpha = open(outref, "w")
     alpha.write(beta)
     alpha.close()
