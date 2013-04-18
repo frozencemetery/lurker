@@ -28,6 +28,16 @@ import time
 def coff(f): # moderately naive method to get celsius from fahrenheit
   return (int((f-32)*(500.0)/(9.0)))/100.0
 
+
+def unhtml(m):
+  m = urllib2.unquote(m)
+  m = m.replace("+noredirect/", "")
+  m = m.replace("+", " ")
+  m = m.replace("&quot;", "\"")
+  m = m.replace("%26", "&")
+  m = m.replace("/_/", " - ")
+  return m
+
 def command(self, e, cmd, c, nick):
   executed = 0
   channel = e.target()
@@ -236,13 +246,7 @@ def command(self, e, cmd, c, nick):
     urlload = response.read()
     m = re.search("(?<=/music/).*?(?=</link>)", urlload)
     m = m.group(0)
-    m = urllib2.unquote(m)
-    m = m.replace("+noredirect/", "")
-    m = m.replace("+", " ")
-    m = m.replace("&quot;", "\"")
-    m = m.replace("%26", "&")
-    ct = m.replace("/_/", " - ")
-    ct = urllib2.unquote(ct)
+    ct = unhtml(m)
     c.privmsg(channel, nick + ": " + ct)
     executed = 1
     pass
@@ -400,11 +404,11 @@ def command(self, e, cmd, c, nick):
       first = re.search("(?<=class=\"even\">).*?</tr>", m).group(0)
       info = re.findall("(?<=<td>).*?(?=</td>)", first)
       
-      track = info[0]
-      artist = info[1]
-      time = info[-2]
+      track = unhtml(info[0])
+      artist = unhtml(info[1])
+      time = unhtml(info[-2])
       if len(info) >= 5:
-        album = " [" + info[2] + "]"
+        album = unhtml(" [" + info[2] + "]")
         pass
       else:
         album = ""
