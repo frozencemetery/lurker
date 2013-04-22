@@ -424,7 +424,7 @@ def command(self, e, cmd, c, nick):
         
         track = unhtml(info[0])
         artist = unhtml(info[1])
-        time = unhtml(info[-2])
+        nptime = unhtml(info[-2])
         if len(info) >= 5:
           album = unhtml(" [" + info[2] + "]")
           pass
@@ -432,7 +432,7 @@ def command(self, e, cmd, c, nick):
           album = ""
           pass
 
-        response = artist + " - \"" + track + "\"" + album + " (" + time + ")"
+        response = artist + " - \"" + track + "\"" + album + " (" + nptime + ")"
         c.privmsg(channel, nick + ": " + response)
         executed = 1
       except:
