@@ -85,54 +85,53 @@ def command(self, e, cmd, c, nick):
     # checking for private queries and responding accordingly
     channel = nick
     pass
-  if nick == "frozencemetery": # my commands.
-    if cmd.startswith("nick "):
-      cmd = cmd.split(" ", 1)[1]
-      c.nick(cmd)
+
+  if cmd.startswith("nick ") and nick == "frozencemetery":
+    cmd = cmd.split(" ", 1)[1]
+    c.nick(cmd)
+    pass
+  elif cmd.startswith("sendroll ") and nick == "frozencemetery":
+    s = cmd.split(" ", 2)
+    if len(s) != 3:
+      c.privmsg(nick, "Parsing error on token: " + cmd)
+      f.write("Parsing error on token: " + cmd)
       pass
-    elif cmd.startswith("sendroll "):
-      s = cmd.split(" ", 2)
-      if len(s) != 3:
+    else:
+      t = s[2].split("d", 1)
+      if len(t) != 2:
         c.privmsg(nick, "Parsing error on token: " + cmd)
         f.write("Parsing error on token: " + cmd)
         pass
       else:
-        t = s[2].split("d", 1)
-        if len(t) != 2:
-          c.privmsg(nick, "Parsing error on token: " + cmd)
-          f.write("Parsing error on token: " + cmd)
-          pass
-        else:
-          counter = roll(t)
-          c.privmsg(s[1], nick + " rolled a " + str(counter))
-          pass
+        counter = roll(t)
+        c.privmsg(s[1], nick + " rolled a " + str(counter))
         pass
       pass
-    if cmd == "disconnect":
-      self.disconnect()
-      pass
-    if cmd == "test":
-      c.privmsg(channel, e.source())
-      pass
-    elif cmd == "die":
-      self.die()
-      pass
-    elif cmd.startswith("join"):
-      z = cmd.split(" ", 1) 
-      disp = z[1].split(" ", 1) 
-      c.join(z[1])
-      pass
-    elif cmd.startswith("say"):
-      z = cmd.split(" ", 2)
-      c.privmsg(z[1], z[2])
-      pass
-    elif cmd.startswith("action"):
-      z=cmd.split(" ", 2) 
-      c.action(z[1], z[2])
-      pass
-    return
-  # commands for all
-  if cmd.startswith("roll"): 
+    pass
+  elif cmd == "disconnect" and nick == "frozencemetery":
+    self.disconnect()
+    pass
+  elif cmd == "test" and nick == "frozencemetery":
+    c.privmsg(channel, e.source())
+    pass
+  elif cmd == "die" and nick == "frozencemetery":
+    self.die()
+    pass
+  elif cmd.startswith("join") and nick == "frozencemetery":
+    z = cmd.split(" ", 1) 
+    disp = z[1].split(" ", 1) 
+    c.join(z[1])
+    pass
+  elif cmd.startswith("say") and nick == "frozencemetery":
+    z = cmd.split(" ", 2)
+    c.privmsg(z[1], z[2])
+    pass
+  elif cmd.startswith("action") and nick == "frozencemetery":
+    z=cmd.split(" ", 2) 
+    c.action(z[1], z[2])
+    pass
+
+  elif cmd.startswith("roll"): 
     s = cmd.split(" ", 1) 
     if len(s) != 2:
       c.privmsg(channel, "Syntax is: \"roll xdy[\xc2z]\".")
