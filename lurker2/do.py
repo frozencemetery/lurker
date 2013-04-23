@@ -28,6 +28,47 @@ import time
 def coff(f): # moderately naive method to get celsius from fahrenheit
   return (int((f-32)*(500.0)/(9.0)))/100.0
 
+def roll(t):
+  testa = t[1].split("+", 1) #
+  testb = t[1].split("-", 1) #
+  if len(testa[0]) > len(testb[0]):
+    numtoroll = int(t[0])
+    sidenum = int(testb[0])
+    bonus = -int(testb[1])
+    pass
+  elif len(testa[0]) < len(testb[0]): #testa's split is better
+    numtoroll = int(t[0])
+    sidenum = int(testa[0])
+    bonus = int(testa[1])
+    pass
+  else: # the two were equal; in other words, no bonus
+    numtoroll = int(t[0])
+    sidenum = int(testa[0])
+    bonus = 0
+    pass
+  if numtoroll < 1:
+    numtoroll = 1
+    pass
+  if sidenum < 2:
+    counter = numtoroll
+    pass
+  else:
+    if numtoroll <= 1000:
+      counter, i = 0, 0
+      while i < numtoroll:
+        roll = random.randint(1, sidenum)
+        counter = counter + roll
+        i = i + 1
+        pass
+      pass
+    else:
+      # approximate with Gaussian
+      counter = int(round(random.gauss(
+            numtoroll*(sidenum+1)/2.0,
+            math.sqrt(numtoroll*(sidenum**2 - 1)/12.0))))
+      pass
+  counter = counter + bonus
+  return counter
 
 def unhtml(m):
   m = urllib2.unquote(m)
@@ -62,38 +103,7 @@ def command(self, e, cmd, c, nick):
           f.write("Parsing error on token: " + cmd)
           pass
         else:
-          testa = t[1].split("+", 1) #
-          testb = t[1].split("-", 1) #
-          if len(testa[0]) > len(testb[0]):
-            numtoroll = int(t[0])
-            sidenum = int(testb[0])
-            bonus = -int(testb[1])
-            pass
-          elif len(testa[0]) < len(testb[0]):
-            numtoroll = int(t[0])
-            sidenum = int(testa[0])
-            bonus = int(testa[1])
-            pass
-          else: # the two were equal; in other words, no bonus
-            numtoroll = int(t[0])
-            sidenum = int(testa[0])
-            bonus = 0
-            pass
-          if numtoroll < 1:
-            numtoroll = 1
-            pass
-          if sidenum <2:
-            counter = numtoroll
-            pass
-          else:
-            counter, i = 0, 0
-            while i < numtoroll:
-              roll = random.randint(1, sidenum)
-              counter = counter + roll
-              i = i + 1
-              pass
-            pass
-          counter = counter + bonus
+          counter = roll(t)
           c.privmsg(s[1], nick + " rolled a " + str(counter))
           pass
         pass
@@ -134,47 +144,9 @@ def command(self, e, cmd, c, nick):
         c.privmsg(channel, "Syntax is: \"roll xdy[\xc2z]\".")
         pass
       else:
-        testa = t[1].split("+", 1) #
-        testb = t[1].split("-", 1) #
-        if len(testa[0]) > len(testb[0]):
-          numtoroll = int(t[0])
-          sidenum = int(testb[0])
-          bonus = -int(testb[1])
-          pass
-        elif len(testa[0]) < len(testb[0]): #testa's split is better
-          numtoroll = int(t[0])
-          sidenum = int(testa[0])
-          bonus = int(testa[1])
-          pass
-        else: # the two were equal; in other words, no bonus
-          numtoroll = int(t[0])
-          sidenum = int(testa[0])
-          bonus = 0
-          pass
-        if numtoroll < 1:
-          numtoroll = 1
-          pass
-        if sidenum < 2:
-          counter = numtoroll
-          pass
-        else:
-          if numtoroll <= 1000:
-            counter, i = 0, 0
-            while i < numtoroll:
-              roll = random.randint(1, sidenum)
-              counter = counter + roll
-              i = i + 1
-              pass
-            pass
-          else:
-            # approximate with Gaussian
-            counter = int(round(random.gauss(
-                  numtoroll*(sidenum+1)/2.0,
-                  math.sqrt(numtoroll*(sidenum**2 - 1)/12.0))))
-            pass
-        counter = counter + bonus
-        if nick != "robbie" and channel == nick:
-          c.privmsg("robbie", "I rolled : " + str(counter) + " for " + nick + ".")
+        counter = roll(t)
+        if nick != "frozencemetery" and channel == nick:
+          c.privmsg("frozencemetery", "I rolled : " + str(counter) + " for " + nick + ".")
           pass
         c.privmsg(channel, "I rolled : " + str(counter) + " for " + nick + ".")
         pass
