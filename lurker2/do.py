@@ -279,6 +279,7 @@ def command(self, e, cmd, c, nick):
       url = "http://thefuckingweather.com/?where="
       ref = "rsrc/tfw.dict"
       cmd = cmd.split(" ", 1)
+
       try:
         cmd = cmd[1]
         if cmd[:4] == "set ":
@@ -298,35 +299,24 @@ def command(self, e, cmd, c, nick):
         fw.close()
         cmd = bill[nick]
         pass
+
       cmd = urllib2.quote(cmd)
       url = url + cmd
-      response = urllib2.urlopen(url)
-      m = response.read()
-      temp = int(re.search("(?<=<span class=\"temperature\" tempf=\").*?(?=\">)", m).group(0))
-      location = re.search("(?<=<span id=\"locationDisplaySpan\" class=\"small\">).*?(?=</span>)", m).group(0)
-      status = re.search("(?<=<p class=\"remark\">).*?(?=</p>)", m).group(0)
-      paren = re.search("(?<=<p class=\"flavor\">).*?(?=</p>)", m).group(0)
-      dayv = re.search("(?<=<th>DAY</th><th style=\"width:7.5em;\">).*(?=</th>)", m).group(0)
-      highv = re.search("(?<=<th>HIGH</th><td class=\"temperature\" tempf=\").*(?=\r)", m).group(0)
-      lowv = re.search("(?<=<th>LOW</th><td class=\"temperature\" tempf=\").*(?=\r)", m).group(0)
-      fcv = re.search("(?<=<th>FORECAST</th><td>).*(?=\r)", m).group(0)
+      m = urllib2.urlopen(url).read()
+      m = m.replace("\n", "")
 
-      highv = re.search("(?<=<td class=\"temperature\" tempf=\").*", highv).group(0)
-      tempha = int(re.search(".*?(?=\">)", highv).group(0))
-      highv = re.search("(?<=tempf=\").*", highv).group(0)
-      templa = int(re.search(".*?(?=\">)", lowv).group(0))
-      lowv = re.search("(?<=tempf=\").*", lowv).group(0)
-      fca = re.search(".*?(?=</td>)", fcv).group(0)
-      fcv = re.search("(?<=<td>).*", fcv).group(0)
-      daya = re.search(".*?(?=</th>)", dayv).group(0)
-      dayv = re.search("(?<=em;\">).*", dayv).group(0)
-      dayb = re.search(".*?(?=</th>)", dayv).group(0)
-      temphb = int(re.search(".*?(?=\">)", highv).group(0))
-      templb = int(re.search(".*?(?=\">)", lowv).group(0))
-      fcb = re.search(".*?(?=</td>)", fcv).group(0)
+      location = re.search("(?<=class=\"small\">).*?(?=</span>)", m).group(0)
+      remark = re.search("(?<=class=\"remark\">).*?(?=</p>)", m).group(0)
+      flavor = re.search("(?<=class=\"flavor\">).*?(?=</p>)", m).group(0)
 
-      magic = "\x02" + location + "\x0F: " + str(temp) + " F (" + str(coff(temp)) + " C) | " + status + " (" + paren + ") | " + daya + ": High " + str(tempha) + " F (" + str(coff(tempha)) + " C), Low " + str(templa) + " F (" + str(coff(templa)) + " C).  " + fca + " | " + dayb + ": High " + str(temphb) + " F (" + str(coff(temphb)) + " C), Low " + str(templb) + " F (" + str(coff(templb)) + " C).  " + fcb
-      magic = magic.replace("ITS", "IT'S")
+      temps = re.findall("(?<=class=\"temperature\" tempf=\").*?(?=\">)", m)
+      days = re.findall("(?<=style=\"width:7.5em;\">).*?(?=</th>)", m)
+
+      fcv = re.search("(?<=<th>FORECAST</th>).*?(?=</tr>)", m).group(0)
+      fcs = re.findall("(?<=<td>).*?(?=</td>)", fcv)
+
+      magic = "\x02" + location + "\x0F: " + temps[0] + " F (" + str(coff(int(temps[0]))) + " C) | " + remark + " (" + flavor + ") | " + days[0] + ": High " + temps[1] + " F (" + str(coff(int(temps[1]))) + " C), Low " + temps[2] + " F (" + str(coff(int(temps[2]))) + " C).  " + fcs[0] + " | " + days[1] + ": High " + temps[3] + " F (" + str(coff(int(temps[3]))) + " C), Low " + temps[4] + " F (" + str(coff(int(temps[4]))) + " C).  " + fcs[1]
+
       switch = random.randint(1,30)
       if switch == 1:
         c.privmsg(channel, "IT'S RAINING MEN")
