@@ -39,7 +39,6 @@ def unhtml(m):
   return m
 
 def command(self, e, cmd, c, nick):
-  executed = 0
   channel = e.target()
   if channel[:1] != "#" and channel[:1] != "&" and channel[:1] != "+" and channel[:1] != "!":
     # checking for private queries and responding accordingly
@@ -49,10 +48,8 @@ def command(self, e, cmd, c, nick):
     if cmd.startswith("nick "):
       cmd = cmd.split(" ", 1)[1]
       c.nick(cmd)
-      executed = 1
       pass
     elif cmd.startswith("sendroll "):
-      executed = 1
       s = cmd.split(" ", 2)
       if len(s) != 3:
         c.privmsg(nick, "Parsing error on token: " + cmd)
@@ -103,36 +100,29 @@ def command(self, e, cmd, c, nick):
       pass
     if cmd == "disconnect":
       self.disconnect()
-      executed = 1
       pass
     if cmd == "test":
       c.privmsg(channel, e.source())
-      executed = 1
       pass
     elif cmd == "die":
       self.die()
-      executed = 1
       pass
     elif cmd.startswith("join"):
       z = cmd.split(" ", 1) 
       disp = z[1].split(" ", 1) 
       c.join(z[1])
-      executed = 1
       pass
     elif cmd.startswith("say"):
       z = cmd.split(" ", 2)
       c.privmsg(z[1], z[2])
-      executed = 1
       pass
     elif cmd.startswith("action"):
       z=cmd.split(" ", 2) 
       c.action(z[1], z[2])
-      executed = 1
       pass
-    pass
+    return
   # commands for all
   if cmd.startswith("roll"): 
-    executed = 1
     s = cmd.split(" ", 1) 
     if len(s) != 2:
       c.privmsg(channel, "Syntax is: \"roll xdy[\xc2z]\".")
@@ -192,7 +182,6 @@ def command(self, e, cmd, c, nick):
     pass
   elif cmd.startswith("help") or cmd.startswith("source"):
     c.privmsg(channel, nick + ": https://github.com/frozencemetery/lurker/blob/master/api.org is the current version.  My BTS, source, and other things can be found at https://github.com/frozencemetery/lurker")
-    executed = 1
     pass
   elif cmd.startswith("hug "):
     name = cmd.split(" ",1)[1]
@@ -222,7 +211,6 @@ def command(self, e, cmd, c, nick):
         c.action(channel, "refuses to violate {0}.".format(name))
         pass
       pass
-    executed = 1
     pass
   elif cmd.startswith("fml"):
     response = urllib2.urlopen('http://www.fmylife.com/random')
@@ -236,7 +224,6 @@ def command(self, e, cmd, c, nick):
       pass
     res = res.replace("&quot;", "\"")
     c.privmsg(channel, nick + ": " + res)
-    executed = 1
     pass
   elif cmd.startswith("fm") or cmd.startswith("np"):
     cmd = cmd.split(" ", 1)
@@ -272,7 +259,6 @@ def command(self, e, cmd, c, nick):
     m = m.group(0)
     ct = unhtml(m)
     c.privmsg(channel, nick + ": " + ct)
-    executed = 1
     pass
   elif cmd.startswith("fw"):
     try:
@@ -334,7 +320,6 @@ def command(self, e, cmd, c, nick):
     except:
       c.privmsg(channel, "Syntax is !fw <location>.  If you have invoked !fw set <location>, you may invoke !fw.")
       pass
-    executed = 1
     pass
   elif cmd.startswith("alert "):
     stof = "rsrc/alerts.db"
@@ -347,7 +332,6 @@ def command(self, e, cmd, c, nick):
     read.write(cmd + "\n")
     read.close()
     c.privmsg(channel, "Reminder saved.")
-    executed = 1
     pass
   elif cmd.startswith("anonalert "):
     stof = "rsrc/alerts.db"
@@ -360,7 +344,6 @@ def command(self, e, cmd, c, nick):
     read.write(cmd + "\n")
     read.close()
     c.privmsg(channel, "Reminder saved.")
-    executed = 1
     pass
   elif cmd == "convo":
     stored = ""
@@ -372,7 +355,6 @@ def command(self, e, cmd, c, nick):
         pass
       pass
     c.privmsg(channel, stored) 
-    executed = 1
     pass
   elif cmd.startswith("convo add "):
     cmd = cmd.split(" ", 2)[2]
@@ -381,26 +363,21 @@ def command(self, e, cmd, c, nick):
     stof.close()
     finalline = "NOW WE'RE HAVING A GOOD TIME RIGHT"
     c.privmsg(channel, finalline)
-    executed = 1
     pass
   elif cmd.startswith("q ") or cmd.startswith("ddg ") or cmd.startswith("ddg ") or cmd.startswith("quack "):
     cmd = cmd.split(" ", 1)[1]
     url = "https://duckduckgo.com/html?kp=-1&q="
     beep = urllib.quote_plus(cmd)
     c.privmsg(channel, nick + ": " + url + beep)
-    executed = 1
     pass
   elif cmd.startswith("test"):
     c.privmsg(channel, nick + ": blargl")
-    executed = 1
     pass
   elif cmd.startswith("ping"):
     c.action(channel, "squeaks at " + nick)
-    executed = 1
     pass
   elif cmd == "static":    
     c.action(channel, "ssssssssssssSSSSSSSSSSSSHHHHHHHHHHHHHHHHHHHHHHHHHHHHHhsssssssssssssssssssss")
-    executed = 1
     pass
   elif cmd.startswith("lantunes") or cmd.startswith("lt"):
     parts = cmd.strip().split(" ",1)
@@ -424,7 +401,6 @@ def command(self, e, cmd, c, nick):
 
         response = artist + " - \"" + track + "\"" + album + " (" + nptime + ")"
         c.privmsg(channel, nick + ": " + response)
-        executed = 1
       except:
         pass
       pass
@@ -438,16 +414,13 @@ def command(self, e, cmd, c, nick):
       except:
         c.privmsg(channel, "Failed to queue to lantunes.")
         pass
-      executed = 1
       pass
     pass
   elif cmd == "sup":
     c.privmsg(channel, "notmuch.")
-    executed = 1
     pass
   elif cmd == "space":
     c.privmsg(channel, "http://spaaaaaaaaaaaaaaaaaaaaaaaccee.com/")
-    executed = 1
     pass
   elif cmd == "rain":
     try:
@@ -485,7 +458,6 @@ def command(self, e, cmd, c, nick):
       addi = addi.replace("</strong>", "")
       addi[0] = 'c'
       c.privmsg(channel, nick + ": " + stat + ".  Furthermore, " + addi)
-      executed = 1
     except:
       c.privmsg("Fuck you and fuck your horse.")
       pass
@@ -562,11 +534,10 @@ def command(self, e, cmd, c, nick):
     for i in range(len(targets)):
       send_hand(targets[i], deck[i*13:(i+1)*13])
       pass
-    executed = 1
     pass
   elif len(cmd) <= 0:
     return
-  if executed == 0:
+  else:
     print "Failed."
     c.action(channel, "doesn't know how to " + cmd + ".")
     pass
