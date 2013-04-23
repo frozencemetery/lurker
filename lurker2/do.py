@@ -134,13 +134,13 @@ def command(self, e, cmd, c, nick):
   elif cmd.startswith("roll"): 
     s = cmd.split(" ", 1) 
     if len(s) != 2:
-      c.privmsg(channel, "Syntax is: \"roll xdy[\xc2z]\".")
-      # \xc2 is the plusorminus character
+      c.privmsg(channel, "Syntax is: \"roll xdy[\xc2\xb1z]\".")
+      # \xc2\xb1 is the ± (plusorminus) character
       pass
     else:
       t = s[1].split("d", 1) 
       if len(t) != 2:
-        c.privmsg(channel, "Syntax is: \"roll xdy[\xc2z]\".")
+        c.privmsg(channel, "Syntax is: \"roll xdy[\xc2\xb1z]\".")
         pass
       else:
         counter = roll(t)
