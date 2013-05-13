@@ -1,3 +1,4 @@
+# coding=utf8 # I hate python
 # Copyright (C) 2012 Robbie Harwood
 # Based on code from the python irclib python-irclib.sourceforge.net (GPL)
 
@@ -134,13 +135,12 @@ def command(self, e, cmd, c, nick):
   elif cmd.startswith("roll"): 
     s = cmd.split(" ", 1) 
     if len(s) != 2:
-      c.privmsg(channel, "Syntax is: \"roll xdy[\xc2\xb1z]\".")
-      # \xc2\xb1 is the ± (plusorminus) character
+      c.privmsg(channel, "Syntax is: \"roll xdy[±z]\".")
       pass
     else:
       t = s[1].split("d", 1) 
       if len(t) != 2:
-        c.privmsg(channel, "Syntax is: \"roll xdy[\xc2\xb1z]\".")
+        c.privmsg(channel, "Syntax is: \"roll xdy[±z]\".")
         pass
       else:
         counter = roll(t)
