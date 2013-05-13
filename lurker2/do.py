@@ -26,7 +26,7 @@ import cPickle
 import time
 
 def coff(f): # moderately naive method to get celsius from fahrenheit
-  return (int((f-32)*(500.0)/(9.0)))/100.0
+  return str((int((int(f)-32)*(500.0)/(9.0)))/100.0)
 
 def roll(t):
   testa = t[1].split("+", 1) #
@@ -272,7 +272,10 @@ def command(self, e, cmd, c, nick):
       fcv = re.search("(?<=<th>FORECAST</th>).*?(?=</tr>)", m).group(0)
       fcs = re.findall("(?<=<td>).*?(?=</td>)", fcv)
 
-      magic = "\x02" + location + "\x0F: " + temps[0] + " F (" + str(coff(int(temps[0]))) + " C) | " + remark + " (" + flavor + ") | " + days[0] + ": High " + temps[1] + " F (" + str(coff(int(temps[1]))) + " C), Low " + temps[2] + " F (" + str(coff(int(temps[2]))) + " C).  " + fcs[0] + " | " + days[1] + ": High " + temps[3] + " F (" + str(coff(int(temps[3]))) + " C), Low " + temps[4] + " F (" + str(coff(int(temps[4]))) + " C).  " + fcs[1]
+      curtemp = temps[0]
+      del(temps[0])
+
+      magic = "\x02" + location + "\x0F: " + curtemp + " F (" + coff(curtemp) + " C) | " + remark + " (" + flavor + ") | " + days[0] + ": High " + temps[0] + " F (" + coff(temps[0]) + " C), Low " + temps[len(days)] + " F (" + coff(temps[len(days)]) + " C).  " + fcs[0] + " | " + days[1] + ": High " + temps[1] + " F (" + coff(temps[1]) + " C), Low " + temps[len(days) + 1] + " F (" + coff(temps[len(days) + 1]) + " C).  " + fcs[1]
 
       switch = random.randint(1,30)
       if switch == 1:
