@@ -26,7 +26,7 @@ def cmdmsg(self, channel, channame, speaker, cmd):
   try:
     if cmd == "fw":
       name = lookup[speaker]
-      
+
       switch = random.randint(1,30)
       if switch == 1:
         channel.msg("IT'S RAINING MEN")
@@ -58,12 +58,12 @@ def cmdmsg(self, channel, channame, speaker, cmd):
       pass
     else:
       return False
-    
+
     url = "http://thefuckingweather.com/?where="
     name = urllib2.quote(cmd)
     url += cmd
     m = urllib2.urlopen(url).read()
-    
+
     temp = int(re.search("(?<=<span class=\"temperature\" tempf=\").*?(?=\">)", m).group(0))
     location = re.search("(?<=<span id=\"locationDisplaySpan\" class=\"small\">).*?(?=</span>)", m).group(0)
     status = re.search("(?<=<p class=\"remark\">).*?(?=</p>)", m).group(0)
