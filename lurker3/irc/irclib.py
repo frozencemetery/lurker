@@ -393,20 +393,3 @@ def set_warn(val):
 def set_silent(val):
   ircutil.__SILENT = val
   pass
-
-# Default: if this was run on its own, connect to foonetic.net
-def main():
-  set_verbose(True)
-  set_debug(True)
-  set_warn(True)
-  conn = IrcConnection("irc.foonetic.net",6667,nick="lurker3",user="lurker3")
-  conn.add_listener(BasicBehavior(["#lurkertest"]))
-  conn.connect()
-  stop = False
-  raw_input()
-  conn.disconnect()
-  SocketManager.exit()
-  pass
-
-if __name__ == "__main__":
-  main()
