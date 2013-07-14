@@ -1,3 +1,5 @@
+# default functions for modules to import
+
 def cmdmsg(self, channel, channame, speaker, cmd):
   return False
 
