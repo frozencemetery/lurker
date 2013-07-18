@@ -108,12 +108,16 @@ def main():
   b = Lurker()
   b.start()
   s = ""
-  while s != "X":
-    s = raw_input()
-    b.send(s)
+  try:
+    while True:
+      s = raw_input()
+      b.send(s)
+      pass
     pass
-  b.stop()
-  SocketManager.exit()
+  except (KeyboardInterrupt, EOFError):
+    b.stop()
+    SocketManager.exit()
+    pass
   pass
 
 if __name__ == "__main__":
