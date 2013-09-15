@@ -55,3 +55,6 @@
   user last spoke.
 - !broadcast <target> <commmand>: Currently not supported.  Will broadcast the
   command to the specified target.  !sendroll will be deprecated by this.
+- !jacket: If your location is set with the bot (throught !fw set) prints the 
+  doineedajacket for your location
+- !jacket <location>: Shows the doineedajacket for the location (see !jacket)

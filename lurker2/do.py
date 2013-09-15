@@ -435,6 +435,46 @@ def command(self, e, cmd, c, nick):
     except:
       c.privmsg("Fuck you and fuck your horse.")
       pass
+  elif cmd.startswith("jacket"):
+    try:
+      url = "http://doineedajacket.com/weather/"
+      ref = "rsrc/tfw.dict"
+      cmd = cmd.split(" ", 1)
+      try:
+        cmd = cmd[1]
+        if cmd[:4] == "set ":
+          cmd = cmd.split(" ", 1)[1]
+          fw = open(ref, "r")
+          bill = cPickle.load(fw)
+          fw.close()
+          bill[nick] = cmd
+          fw = open(ref, "w")
+          cPickle.dump(bill, fw)
+          fw.close()
+          pass
+        pass
+      except:
+        fw = open(ref, "r")
+        bill = cPickle.load(fw)
+        fw.close()
+        cmd = bill[nick]
+        pass
+      cmd = urllib2.quote(cmd)
+      url = url + cmd
+      response = urllib2.urlopen(url)
+      m = response.read()
+      loc = re.search("(?<=<div class='location'>).*?(?=</div>)", m).group(0)
+      time = re.search("(?<=<div class='time'>).*?(?=</div>)", m).group(0)
+      need = re.search("(?<=<h1>).*?(?=</h1>)", m).group(0)
+      twohrs = re.search("(?<=<h2>).*?(?=</h2>)", m).group(0)
+      fourhrs = re.search("(?<=<h3>).*?(?=</h3>)", m).group(0)
+      eighthrs = re.search("(?<=<h4>).*?(?=</h4>)", m).group(0)
+      magic = "Based on the weather in " + loc + ", " + time + ": " + need + ". "
+      magic = magic + twohrs + ". " + fourhrs + ". " + eighthrs + "."
+      c.privmsg(channel, magic) 
+    except:
+      c.privmsg(channel, "Syntax is !jacket <location>.  If you have invoked !fw set <location>, you may invoke !jacket.")
+      pass
   elif cmd.startswith("deal "):
     targets = cmd.split(" ", 5)[1:5]
 
