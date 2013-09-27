@@ -464,12 +464,12 @@ def command(self, e, cmd, c, nick):
       response = urllib2.urlopen(url)
       m = response.read()
       loc = re.search("(?<=<div class='location'>).*?(?=</div>)", m).group(0)
-      time = re.search("(?<=<div class='time'>).*?(?=</div>)", m).group(0)
+      jtime = re.search("(?<=<div class='time'>).*?(?=</div>)", m).group(0)
       need = re.search("(?<=<h1>).*?(?=</h1>)", m).group(0)
       twohrs = re.search("(?<=<h2>).*?(?=</h2>)", m).group(0)
       fourhrs = re.search("(?<=<h3>).*?(?=</h3>)", m).group(0)
       eighthrs = re.search("(?<=<h4>).*?(?=</h4>)", m).group(0)
-      magic = "Based on the weather in " + loc + ", " + time + ": " + need + ". "
+      magic = "Based on the weather in " + loc + ", " + jtime + ": " + need + ". "
       magic = magic + twohrs + ". " + fourhrs + ". " + eighthrs + "."
       c.privmsg(channel, magic) 
     except:
