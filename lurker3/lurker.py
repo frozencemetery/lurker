@@ -92,8 +92,8 @@ class Lurker(IrcListener):
     self.conn.disconnect()
     pass
 
-  def on_chan_msg(self, owner, sender, channel, message):
-    owner.send(channel, message)
+  def on_chan_msg(self, owner, sender, channel, message, isact):
+    owner.send.privmsg(channel, message)
     pass
 
   def send(self, msg):

@@ -36,7 +36,7 @@ class IrcListener(object):
     pass
 
   # called when someone sends a message to a channel we're in
-  def on_chan_msg(self, owner, sender, channel, message):
+  def on_chan_msg(self, owner, sender, channel, message, isact):
     pass
 
   # called when someone joins a channel
@@ -311,7 +311,7 @@ class IrcConnection(IrcListener):
       pass
 
     elif command.lower() == "privmsg":
-      isact = privmsg.startswith(ircutil.ACTION)
+      isact = command.lower().startswith(ircutil.ACTION)
       # either a channel OR personal message
       if re.match(NICK, paramlist[0]):
         for l in self.Listeners:
