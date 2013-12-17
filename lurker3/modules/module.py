@@ -1,12 +1,9 @@
 # default functions for modules to import
 
-def cmdmsg(self, channel, channame, speaker, cmd):
+def cmdmsg(self, senderf, channame, speaker, cmdstr, isact):
   return False
 
-def regmsg(self, channame, speaker, msg):
-  return
-
-def action(self, channame, speaker, msg):
+def regmsg(self, channame, speaker, cmdstr, isact):
   return
 
 def userjoin(self, channame, joiner):
@@ -15,16 +12,10 @@ def userjoin(self, channame, joiner):
 def userpart(self, channame, parter):
   return
 
-def userquit(self, channame, quitter):
+def botjoin(self, channame):
   return
 
-def botjoin(self, channame, botname):
-  return
-
-def botpart(self, channame, botname):
-  return
-
-def botquit(self, botname):
+def botpart(self, channame):
   return
 
 def unload(self):

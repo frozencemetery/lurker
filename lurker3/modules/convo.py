@@ -2,7 +2,7 @@ import random
 
 from module import *
 
-convodb = "rsrc/convo.db"
+convodb = "modules/rsrc/convo.db"
 
 convos = []
 
@@ -23,14 +23,17 @@ def addconvo(self, convo):
   f.close()
   pass
 
-def cmdmsg(self, channel, channame, speaker, cmd):
+def cmdmsg(self, senderf, channel, speaker, cmd, isact):
   if cmd == "convo":
-    channel.msg(getconvo(self))
+    senderf(getconvo(self))
     return True
   elif cmd[:10] == "convo add ":
     addconvo(self, cmd.split(" ", 2)[2])
-    channel.msg("NOW WE'RE HAVING A GOOD TIME RIGHT")
+    senderf("NOW WE'RE HAVING A GOOD TIME RIGHT")
     return True
   else:
     return False
+  pass
+
+def regmsg(self, channel, speaker, cmd, isact):
   pass
