@@ -89,6 +89,7 @@ class IrcError(Exception):
   pass
 
 # nearly-empty class whose only purpose is to hold lambdas
+# TODO: consider metaclassing
 class IrcSender(object):
   def __init__(self, owner):
     self.owner = owner
