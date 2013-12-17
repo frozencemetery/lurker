@@ -56,7 +56,7 @@ class IrcListener(object):
     pass
 
   # called when someone sends us a private message
-  def on_priv_msg(self, owner, sender, message):
+  def on_priv_msg(self, owner, sender, message, isact):
     pass
 
   # called after we've registered with NICK and USER

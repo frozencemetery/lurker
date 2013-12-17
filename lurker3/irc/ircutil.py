@@ -14,7 +14,7 @@ ACTION = chr(7) + "ACTION" + chr(7)
 ALPHA = r"[a-zA-Z]"
 NUM = "[0-9]"
 SPACE = r" +"
-SPECIAL = r"[-\[\]\\`^\{\}]"
+SPECIAL = r"[-\[\]\\`^\{\}_]"
 CRLF = r"\r\n"
 
 # unions of above
