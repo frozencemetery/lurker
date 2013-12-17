@@ -66,6 +66,14 @@ class IrcListener(object):
   # called when the server sets our mode to something
   def on_user_mode(self, owner, sender, mode):
     pass
+
+  # called when someone leaves a channel
+  def on_part(self, owner, sender, channel, message):
+    pass
+
+  # called when someone quits a server
+  def on_quit(self, owner, sender, message):
+    pass
   pass
 
 class BasicBehavior(IrcListener):
@@ -357,6 +365,24 @@ class IrcConnection(IrcListener):
     elif command.lower() == "join":
       for l in self.Listeners:
         wrap(l.on_join, self, sender, paramlist[0])
+        pass
+      pass
+    elif command.lower() == "part":
+      message = ""
+      if len(paramlist) > 1:
+        message = paramlist[1]
+        pass
+      for l in self.Listeners:
+        wrap(l.on_part, self, sender, paramlist[0], messsage)
+        pass
+      pass
+    elif command.lower() == "quit":
+      message = ""
+      if len(paramlist) > 0:
+        message = paramlist[0]
+        pass
+      for l in self.Listeners:
+        wrap(l.on_quit, self, sender, messsage)
         pass
       pass
     else:
