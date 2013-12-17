@@ -73,6 +73,8 @@ class Lurker(IrcListener):
       # one gets to speak each time something is said.  Don't load modules
       # that conflict.
 
+      # http://achewood.com/index.php?date=03042004
+
       message = message[1:] # del(message[0])
       msglam = lambda message: owner.send.privmsg(channel, message)
       for mod in self.moddict.values():
@@ -80,9 +82,10 @@ class Lurker(IrcListener):
           break
         pass
       pass
+
     else:
       for mod in self.moddict.values():
-        mod.regmsg(mod, channel, sender, message, isact):
+        mod.regmsg(mod, channel, sender, message, isact)
         pass
       pass
     pass
