@@ -373,7 +373,7 @@ class IrcConnection(IrcListener):
         message = paramlist[1]
         pass
       for l in self.Listeners:
-        wrap(l.on_part, self, sender, paramlist[0], messsage)
+        wrap(l.on_part, self, sender, paramlist[0], message)
         pass
       pass
     elif command.lower() == "quit":
@@ -382,7 +382,7 @@ class IrcConnection(IrcListener):
         message = paramlist[0]
         pass
       for l in self.Listeners:
-        wrap(l.on_quit, self, sender, messsage)
+        wrap(l.on_quit, self, sender, message)
         pass
       pass
     else:
