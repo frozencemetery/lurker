@@ -1,11 +1,45 @@
 * submodules implement:
-- cmdmsg   :: (channel socket, channel name, speaker name, cmd string) -> bool
-- regmsg   :: (channel name, speaker name, reg string)                 -> void
-- action   :: (channel name, speaker name, reg string)                 -> void
-- userjoin :: (channel name, joiner)                                   -> void
-- userpart :: (channel name, parter name)                              -> void
-- userquit :: (channel name, quitter name)                             -> void
-- botjoin  :: (channel name, bot name)                                 -> void
-- botpart  :: (channel name, bot name)                                 -> void
-- botquit  :: (bot name)                                               -> void
-- unload   :: ()                                                       -> void
+** cmdmsg :: (senderf, channame, speaker, cmdstr, isact) -> bool
+Interpret a command message.  Return true of senderf is called.
+- senderf :: String -> void
+  Sends a message along the channel.
+- channame :: String
+  The name of the current channel.
+- speaker :: (String, String, String)
+  A tuple for the person who said the message.
+- cmdstr :: String
+  The string that was said.
+- isact :: Bool
+  Whether the message was an action.
+** regmsg :: (channame, speaker, cmdstr, isact) -> void
+Interpret a regular message.
+- channame :: String
+  The name of the current channel.
+- speaker :: (String, String, String)
+  A tuple for the person who said the message.
+- cmdstr :: String
+  The string that was said.
+- isact :: Bool
+  Whether the message was an action.
+** userjoin :: (channame, username) -> void
+Process a user join event.
+- channame :: String
+  The name of the current channel.
+- username :: (String, String, String)
+  A tuple for the person who joined.
+** userpart :: (channame, username) -> void
+Process a user part event.
+- channame :: String
+  The name of the current channel.
+- username :: (String, String, String)
+  A tuple for the person who left.
+** botjoin :: (channame) -> void
+Process a bot join event.
+- channame :: String
+  The name of the channel just joined.
+** botpart :: (channame) -> void
+Process a bot part event.
+- channame :: String
+  The name of the channel just parted.
+** unload :: () -> void
+Save any state and prepare for module unload.
