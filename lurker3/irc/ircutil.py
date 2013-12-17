@@ -14,13 +14,14 @@ ACTION = chr(7) + "ACTION" + chr(7)
 ALPHA = r"[a-zA-Z]"
 NUM = "[0-9]"
 SPACE = r" +"
-SPECIAL = r"[-\[\]\\`^\{\}_]"
+SPECIAL = r"[\[\]\\`^\{\}_\|]"
 CRLF = r"\r\n"
 
 # unions of above
 ALPHANUM = "(?:" + ALPHA + "|" + NUM + ")"
 ALPHANUMDASH = "(?:" + ALPHA + "|" + NUM + "|-)"
-NICKCH = "(?:"+ ALPHA + "|" + NUM + "|" + SPECIAL + ")"
+NICKCH = "(?:"+ ALPHA + "|" + NUM + "|" + SPECIAL + "|" + "[-]" + ")"
+INITNICKCH = "(?:"+ ALPHA + "|" + SPECIAL + ")"
 
 # first order tokens
 HOST =\
@@ -29,7 +30,7 @@ SERVERNAME = HOST
 USER = r"[^ @]+"
 COMMAND = "(?:" + ALPHA + "+|" + NUM * 3 + ")"
 MIDDLE = r"[^\r\n: ][^\r\n ]*"
-NICK = ALPHA + "+" + NICKCH + "*"
+NICK = INITNICKCH + "+" + NICKCH + "*"
 TRAILING = r"[^\r\n]*"
 
 # second order tokens
