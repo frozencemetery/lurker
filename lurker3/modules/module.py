@@ -12,7 +12,7 @@ def regmsg(channame, speaker, cmdstr, isact):
 def userjoin(channame, joiner):
   return
 
-def userpart(channame, parter):
+def userpart(channame, parter, message):
   return
 
 def botjoin(channame):

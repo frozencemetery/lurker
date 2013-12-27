@@ -27,7 +27,7 @@ Process a user join event.
   The name of the current channel.
 - username :: (String, String, String)
   A tuple for the person who joined.
-** userpart :: (channame, username) -> void
+** userpart :: (channame, username, message) -> void
 Process a user part event.
 - channame :: String
   The name of the current channel.
