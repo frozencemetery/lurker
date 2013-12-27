@@ -99,16 +99,28 @@ class Lurker(IrcListener):
     pass
 
   def on_join(self, owner, sender, channel):
+    if sender[0] == owner.nick:
+      for mod in self.moddict.values():
+        mod.botjoin(channel)
+        pass
+      return
+
     for mod in self.moddict.values():
       mod.userjoin(channel, sender)
       pass
-    pass
+    return
 
   def on_part(self, owner, sender, channel, message):
+    if sender[0] == owner.nick:
+      for mod in self.moddict.values():
+        mod.botpart(channel)
+        pass
+      return
+
     for mod in self.moddict.values():
       mod.userpart(channel, sender, message)
       pass
-    pass
+    return
 
   def send(self, msg):
     self.conn.send.privmsg("#lurkertest", msg)
