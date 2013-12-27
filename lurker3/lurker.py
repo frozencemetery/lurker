@@ -48,16 +48,20 @@ class Lurker(IrcListener):
 
     # autoload modules
     self.moddict = {}
-    for module in open(self.autoloadf, 'r').read():
-      try:
-        self.load(module)
-        print("loaded module: " + modname)
-        pass
-      except:
-        print("module '" + modname + "' failed to autoload")
+    with open(self.autoloadf, 'r') as f:
+      for module in f.read().split("\n"):
+        if module == "":
+          continue
+
+        try:
+          self.load(module)
+          print("autoloaded module: " + module)
+          pass
+        except:
+          print("module '" + module + "' failed to autoload")
+          pass
         pass
       pass
-
     pass
 
   def start(self):
