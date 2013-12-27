@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 # this loads a lurker interp with CLI interface provided by a backend
 # this backend is a separate module, which is reloadable
 
