@@ -1,22 +1,25 @@
 # default functions for modules to import
+# e.g.,
+#   from module import *
+# then override the relevant functions
 
-def cmdmsg(self, senderf, channame, speaker, cmdstr, isact):
+def cmdmsg(senderf, channame, speaker, cmdstr, isact):
   return False
 
-def regmsg(self, channame, speaker, cmdstr, isact):
+def regmsg(channame, speaker, cmdstr, isact):
   return
 
-def userjoin(self, channame, joiner):
+def userjoin(channame, joiner):
   return
 
-def userpart(self, channame, parter):
+def userpart(channame, parter):
   return
 
-def botjoin(self, channame):
+def botjoin(channame):
   return
 
-def botpart(self, channame):
+def botpart(channame):
   return
 
-def unload(self):
+def unload():
   return

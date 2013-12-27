@@ -29,8 +29,8 @@ class Lurker(IrcListener):
     if modname not in self.moddict.keys():
       pass
     else:
-      self.moddict[modname].unload(moddict[modname])
-      del moddict[modname]
+      self.moddict[modname].unload()
+      del self.moddict[modname]
       pass
     pass
 
@@ -80,14 +80,14 @@ class Lurker(IrcListener):
       message = message[1:] # del(message[0])
       msglam = lambda message: owner.send.privmsg(channel, message)
       for mod in self.moddict.values():
-        if mod.cmdmsg(mod, msglam, channel, sender, message, isact):
+        if mod.cmdmsg(msglam, channel, sender, message, isact):
           break
         pass
       pass
 
     else:
       for mod in self.moddict.values():
-        mod.regmsg(mod, channel, sender, message, isact)
+        mod.regmsg(channel, sender, message, isact)
         pass
       pass
     pass
