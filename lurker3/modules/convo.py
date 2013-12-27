@@ -4,36 +4,66 @@ from module import *
 
 convodb = "modules/rsrc/convo.db"
 
-convos = []
+convos = [] # globalize THIS
 
-f = open(convodb, 'r')
-for line in f:
-  convos.append(line)
+def loaddb():
+  global convos
+
+  with open(convodb, 'r') as f:
+    convos = f.read().split('\n')
+    pass
+  if convos[-1] == "":
+    # human editing of this file will introduce a newline because people are
+    # sane.  However, python with the join/split functions does not expect
+    # this newline, and kindly makes a mess on the floor when it goes to use
+    # this array.
+    del(convos[-1])
+    writedb()
+    return loaddb() # this is a tail call.  Python will ignore this fact.
+  print "loaded okay"
   pass
-f.close()
 
-def getconvo(self):
-  ind = random.randint(0, len(self.convos) - 1)
-  return self.convos[ind]
+def getconvo():
+  global convos
 
-def addconvo(self, convo):
-  self.convos.append(convo)
-  f = open(convodb, 'a')
-  f.write(convo + '\n')
-  f.close()
+  return random.choice(convos)
+
+def writedb():
+  with open(convodb, 'w') as f:
+    f.write('\n'.join(convos))
+    pass
   pass
 
-def cmdmsg(self, senderf, channel, speaker, cmd, isact):
+def addconvo(convo):
+  global convos
+
+  convos.append(convo)
+  with open(convodb, 'a') as f:
+    # since we removed any trailing newline when we loaded, and since our full
+    # write does not add one, we should not add one here else we introduce
+    # gaps.
+    f.write('\n' + convo)
+    pass
+  pass
+
+def cmdmsg(senderf, channel, speaker, cmd, isact):
+  if isact:
+    return False
+
   if cmd == "convo":
-    senderf(getconvo(self))
+    senderf(getconvo())
     return True
-  elif cmd[:10] == "convo add ":
-    addconvo(self, cmd.split(" ", 2)[2])
+  elif cmd.startswith("convo add "):
+    addconvo(cmd.split(" ", 2)[2])
     senderf("NOW WE'RE HAVING A GOOD TIME RIGHT")
     return True
-  else:
-    return False
+
+  return False
+
+def unload():
+  writedb()
   pass
 
-def regmsg(self, channel, speaker, cmd, isact):
-  pass
+######
+
+loaddb()
