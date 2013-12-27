@@ -68,6 +68,8 @@ class Lurker(IrcListener):
     self.conn.disconnect()
     pass
 
+  # IrcListener stuff
+
   def on_chan_msg(self, owner, sender, channel, message, isact):
     if message[0] == '!':
       # The module earlier in the alphabet gets priority.  I don't like this
@@ -89,6 +91,18 @@ class Lurker(IrcListener):
       for mod in self.moddict.values():
         mod.regmsg(channel, sender, message, isact)
         pass
+      pass
+    pass
+
+  def on_join(self, owner, sender, channel):
+    for mod in self.moddict.values():
+      mod.userjoin(channel, sender)
+      pass
+    pass
+
+  def on_part(self, owner, sender, channel, message):
+    for mod in self.moddict.values():
+      mod.userpart(channel, sender, message)
       pass
     pass
 
