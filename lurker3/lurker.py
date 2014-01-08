@@ -11,6 +11,13 @@ from irc.irclib import debug, warn, verbose, prnt
 from irc.irclib import BasicBehavior, SocketManager
 from irc.irclib import IrcConnection, IrcListener
 
+def frob_sender(owner, sender):
+  privlam = lambda message: owner.send.privmsg(sender[0], message)
+  new = list(sender)
+  new.append(privlam)
+  new = tuple(new)
+  return new
+
 class Lurker(IrcListener):
   moddict = None
   autoloadf = "modules/autoload"
@@ -75,6 +82,7 @@ class Lurker(IrcListener):
   # IrcListener stuff
 
   def on_chan_msg(self, owner, sender, channel, message, isact):
+    sender = frob_sender(owner, sender)
     if message[0] == '!':
       # The module earlier in the alphabet gets priority.  I don't like this
       # and neither do you.  We do need to enforce the constraint that only
@@ -99,6 +107,7 @@ class Lurker(IrcListener):
     pass
 
   def on_join(self, owner, sender, channel):
+    sender = frob_sender(owner, sender)
     if sender[0] == owner.nick:
       for mod in self.moddict.values():
         mod.botjoin(channel)
@@ -111,6 +120,7 @@ class Lurker(IrcListener):
     return
 
   def on_part(self, owner, sender, channel, message):
+    sender = frob_sender(owner, sender)
     if sender[0] == owner.nick:
       for mod in self.moddict.values():
         mod.botpart(channel)
