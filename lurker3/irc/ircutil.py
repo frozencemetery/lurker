@@ -24,8 +24,9 @@ NICKCH = "(?:"+ ALPHA + "|" + NUM + "|" + SPECIAL + "|" + "[-]" + ")"
 INITNICKCH = "(?:"+ ALPHA + "|" + SPECIAL + ")"
 
 # first order tokens
+# this should maybe be... I dunno, something more like `[^ ]+`?
 HOST =\
-    ALPHA + "(?:" + ALPHANUMDASH + "+\.)+" + ALPHANUMDASH + "*" + ALPHANUM
+    ALPHANUM + "(?:" + ALPHANUMDASH + "+\.)+" + ALPHANUMDASH + "*" + ALPHANUM
 SERVERNAME = HOST
 USER = r"[^ @]+"
 COMMAND = "(?:" + ALPHA + "+|" + NUM * 3 + ")"
