@@ -42,8 +42,8 @@ class Lurker(IrcListener):
     pass
 
   def reload(self, modname):
-    self.unload(modname)
-    self.load(modname)
+    self.load(modname) # prevents explosion; nop if loaded
+    reload(self.moddict[modname])
     pass
 
   def __init__(self):
