@@ -3,6 +3,7 @@
 # this loads a lurker interp with CLI interface provided by a backend
 # this backend is a separate module, which is reloadable
 
+import os
 import sys
 
 import irc.irclib as irclib
@@ -18,11 +19,19 @@ def frob_sender(owner, sender):
   new = tuple(new)
   return new
 
+def is_module(path):
+  # check that the thing we're loading is a file
+  return os.path.isfile("modules/" + path + ".py")
+
 class Lurker(IrcListener):
   moddict = None
   autoloadf = "modules/autoload"
 
   def load(self, modname):
+    if not is_module(modname):
+      print "rejecting possibly malicious module: " + modname
+      return
+
     if modname in self.moddict.keys():
       pass
     else:
@@ -33,6 +42,9 @@ class Lurker(IrcListener):
     pass
 
   def unload(self, modname):
+    if not is_module(modname):
+      print "rejecting possibly malicious module: " + modname
+      return
     if modname not in self.moddict.keys():
       pass
     else:
@@ -42,6 +54,9 @@ class Lurker(IrcListener):
     pass
 
   def reload(self, modname):
+    if not is_module(modname):
+      print "rejecting possibly malicious module: " + modname
+      return
     self.load(modname) # prevents explosion; nop if loaded
     reload(self.moddict[modname])
     pass
