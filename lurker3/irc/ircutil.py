@@ -38,13 +38,13 @@ TRAILING = r"[^\r\n]*"
 PREFIX =\
     "(?:" + SERVERNAME + ")|(?:" + NICK + "(?:!" + USER + "@" + HOST + ")?)"
 
-PARAMS = SPACE + "(?:" + MIDDLE + SPACE + ")*" + "(?::" + TRAILING + ")?"
+PARAMS = SPACE + "(?:" + MIDDLE + SPACE + ")*" + "(?::" + TRAILING + "|" + MIDDLE + ")?"
 
 MESSAGE = "(?::" + "(" + PREFIX + ")" + SPACE + ")?" +\
           "(" + COMMAND + ")" +\
           "(" + PARAMS + ")" + CRLF
 PARAMGRP =\
-    SPACE + "((?:" + MIDDLE + SPACE + ")*)" + "(?::(" + TRAILING + "))?"
+    SPACE + "((?:" + MIDDLE + SPACE + ")*)" + "(?::(" + TRAILING + ")|(" + MIDDLE + "))?"
 PREFIXGRP = "(" + SERVERNAME + ")|(?:(" + NICK + \
              ")(?:!(" + USER + ")@(" + HOST + "))?)"
 
