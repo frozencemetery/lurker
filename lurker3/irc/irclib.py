@@ -295,6 +295,9 @@ class IrcConnection(IrcListener):
     if not(paramgroups[1] == None):
       paramlist.append(paramgroups[1])
       pass
+    if not(paramgroups[2] == None):
+      paramlist.append(paramgroups[2])
+      pass
     debug("Parameters:",", ".join(str(p) for p in paramlist))
 
     if prefix == None:
