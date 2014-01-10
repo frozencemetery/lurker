@@ -71,10 +71,10 @@ def regmsg(channame, speaker, cmdstr, isact):
   return maybe_alert(speaker)
 
 def userjoin(channame, username):
-  return maybe_alert(speaker)
+  return maybe_alert(username)
 
 def userpart(channame, username):
-  return maybe_alert(speaker)
+  return maybe_alert(username)
 
 def unload():
   writedb()
