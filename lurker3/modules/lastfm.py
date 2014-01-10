@@ -1,64 +1,78 @@
-import cPickle
 import re
+import urllib
 import urllib2
+
+import cPickle as P
 
 from module import *
 
-lastfmdict = "rsrc/lastfm.dict"
+lastfmdict = "modules/rsrc/lastfm.dict"
+users = {}
 
-f = open(lastfmdict, 'r')
-lookup = cPickle.load(f)
-f.close()
+def loaddict():
+  global users
 
-def reloaddict(self):
-  f = open(lastfmdict, 'r')
-  self.lookup = cPickle.load(f)
-  f.close()
-  pass
-
-def dumpdict(self):
-  f = open(lastfmdict, 'w')
-  cPickle.dump(self.lookup, f)
-  f.close()
-
-def addentry(self, nick, lastfm):
-  self.lookup[nick] = lastfm
-  dumpdict(self)
-  pass
-
-def cmdmsg(self, channel, channame, speaker, cmd):
-  if cmd == "fm" or cmd == "np":
-    lastfm = self.lookup[speaker]
+  try:
+    with open(lastfmdict, 'r') as f:
+      users = P.load(f)
+      pass
+  except:
+    print "failed to load lastfm.dict; corruption possible!"
     pass
-  elif cmd[:7] == "fm set " or cmd[:7] == "np set ":
-    lastfm = cmd.split(" ", 2)[2]
-    addentry(self, speaker, lastfm)
-    pass
-  elif cmd[:3] == "fm " or cmd[:3] == "np ":
-    lastfm = cmd.split(" ", 1)[1]
-    pass
-  if not lastfm:
-    return False
-  else:
-    try:
-      url = "http://ws.audioscrobbler.com/1.0/user/" + user + "/recenttracks.rss"
-      urlload = urllib2.urlopen(url).read()
-      m = re.search("(?<=/music/).*?(?=</link>)", urlload)
-      m = m.group(0)
-      m = urllib2.unquote(m)
-      m = m.replace("+noredirect/", "")
-      m = m.replace("+", " ")
-      m = m.replace("&quot;", "\"")
-      m = m.replace("%26", "&")
-      ct = m.replace("/_/", " - ")
-      ct = urllib2.unquote(ct)
-      channel.msg(speaker + ": " + ct)
-      return True
-    except:
-      return False
-    pass
-  pass
+  return
 
-def unload(self):
-  dumpdict(self)
-  pass
+def writedb():
+  global users
+
+  with open(lastfmdict, 'w') as f:
+    P.dump(users, f)
+    pass
+  return
+
+def unhtml(m):
+  m = urllib2.unquote(m)
+  m = m.replace("+noredirect/", "")
+  m = m.replace("+", " ")
+  m = m.replace("&quot;", "\"")
+  m = m.replace("%26", "&")
+  m = m.replace("/_/", " - ")
+  return m
+
+def cmdmsg(senderf, channame, speaker, cmdstr, isact):
+  global users
+
+  if cmdstr.startswith("fm") or cmdstr.startswith("np"):
+    cmd = cmdstr.split(" ", 2)
+    if len(cmd) == 3 and cmd[1] == "set":
+      u = cmd[2]
+      users[speaker[0]] = u
+      writedb()
+      pass
+    elif len(cmd) == 2:
+      u = cmd[1]
+      pass
+    else:
+      try:
+        u = users[speaker[0]]
+        pass
+      except:
+        senderf("Syntax is `!fm username`.  If you have invoked `!fm set username`, you may invoke `!fm`.")
+        return True
+      pass
+
+    url = "http://ws.audioscrobbler.com/1.0/user/" + u + "/recenttracks.rss"
+    response = urllib2.urlopen(url)
+    urlload = response.read()
+    m = re.search("(?<=/music/).*?(?=</link>)", urlload).group(0)
+    ct = unhtml(m)
+    senderf(speaker[0] + ": " + ct)
+    pass
+  return False
+
+def unload():
+  writedb()
+  return
+
+######
+
+loaddict()
