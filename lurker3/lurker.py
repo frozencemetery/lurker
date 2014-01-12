@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 # this loads a lurker interp with CLI interface provided by a backend
-# this backend is a separate module, which is reloadable
 
 import sys
 
@@ -34,7 +33,8 @@ class Lurker(IrcListener):
       #   the module named by name. However, when a non-empty fromlist
       #   argument is given, the module named by name is returned.
 
-      self.moddict[modname] = __import__("modules." + modname, fromlist = ["_"])
+      self.moddict[modname] = \
+          __import__("modules." + modname, fromlist = ["_"])
       pass
     pass
 
