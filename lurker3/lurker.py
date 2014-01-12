@@ -146,10 +146,9 @@ class Lurker(IrcListener):
       mod.userpart(channel, sender, message)
       pass
     return
+  pass
 
-  def send(self, msg):
-    self.conn.send.privmsg("#lurkertest", msg)
-    pass
+class GotDie(Exception): # goto
   pass
 
 def main():
@@ -158,6 +157,7 @@ def main():
   irclib.set_debug(True)
   b = Lurker()
   b.start()
+
   s = ""
   try:
     while True:
@@ -166,10 +166,11 @@ def main():
       if cmd == "load": b.load(s[1])
       elif cmd == "unload": b.unload(s[1])
       elif cmd == "reload": b.reload(s[1])
-      else: b.send(s)
+      elif cmd == "die": raise GotDie()
+      else: print "unknown command!"
       pass
     pass
-  except (KeyboardInterrupt, EOFError):
+  except (KeyboardInterrupt, EOFError, GotDie):
     b.stop()
     SocketManager.exit()
     pass
