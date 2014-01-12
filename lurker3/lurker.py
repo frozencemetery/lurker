@@ -3,7 +3,6 @@
 # this loads a lurker interp with CLI interface provided by a backend
 # this backend is a separate module, which is reloadable
 
-import os
 import sys
 
 import irc.irclib as irclib
@@ -19,32 +18,27 @@ def frob_sender(owner, sender):
   new = tuple(new)
   return new
 
-def is_module(path):
-  # check that the thing we're loading is a file
-  return os.path.isfile("modules/" + path + ".py")
-
 class Lurker(IrcListener):
   moddict = None
   autoloadf = "modules/autoload"
 
   def load(self, modname):
-    if not is_module(modname):
-      print "rejecting possibly malicious module: " + modname
-      return
-
     if modname in self.moddict.keys():
       pass
     else:
       # try to load from modules/${modname}.py
-      exec("import modules." + modname + ' as ' + modname)
-      self.moddict[modname] = locals()[modname]
+      # from http://docs.python.org/2/library/functions.html#__import__:
+      #
+      #   When the name variable is of the form package.module, normally, the
+      #   top-level package (the name up till the first dot) is returned, not
+      #   the module named by name. However, when a non-empty fromlist
+      #   argument is given, the module named by name is returned.
+
+      self.moddict[modname] = __import__("modules." + modname, fromlist = ["_"])
       pass
     pass
 
   def unload(self, modname):
-    if not is_module(modname):
-      print "rejecting possibly malicious module: " + modname
-      return
     if modname not in self.moddict.keys():
       pass
     else:
@@ -54,9 +48,6 @@ class Lurker(IrcListener):
     pass
 
   def reload(self, modname):
-    if not is_module(modname):
-      print "rejecting possibly malicious module: " + modname
-      return
     self.load(modname) # prevents explosion; nop if loaded
     reload(self.moddict[modname])
     pass
