@@ -2,6 +2,8 @@
 
 # this loads a lurker interp with CLI interface provided by a backend
 
+import cmd
+import readline
 import sys
 
 import irc.irclib as irclib
@@ -17,11 +19,24 @@ def frob_sender(owner, sender):
   new = tuple(new)
   return new
 
-class Lurker(IrcListener):
+class Lurker(IrcListener, cmd.Cmd):
   moddict = None
   autoloadf = "modules/autoload"
+  prompt = "=||> "
 
-  def load(self, modname):
+  def postcmd(self, stop, line):
+    if stop or line == "EOF":
+      return True
+    return False
+
+  def do_exit(self, line):
+    print "Exiting..."
+    return
+
+  def do_EOF(self, line):
+    return self.do_exit(line)
+
+  def do_load(self, modname):
     if modname in self.moddict.keys():
       pass
     else:
@@ -38,7 +53,7 @@ class Lurker(IrcListener):
       pass
     pass
 
-  def unload(self, modname):
+  def do_unload(self, modname):
     if modname not in self.moddict.keys():
       pass
     else:
@@ -47,12 +62,19 @@ class Lurker(IrcListener):
       pass
     pass
 
-  def reload(self, modname):
-    self.load(modname) # prevents explosion; nop if loaded
+  def do_reload(self, modname):
+    self.do_load(modname) # prevents explosion; nop if loaded
     reload(self.moddict[modname])
     pass
 
   def __init__(self):
+    # Python's multiple inheritance doesn't understand what's going on here,
+    # so we need to be explicit
+    cmd.Cmd.__init__(self) # initialize cmd stuff
+    pass
+
+  def start(self):
+    # TODO remove hardcoded values here
     self.conn = IrcConnection("irc.foonetic.net", 6667,
                               nick="lurker3", user="lurker3")
     bb = BasicBehavior(["#lurkertest"])
@@ -67,7 +89,7 @@ class Lurker(IrcListener):
           continue
 
         try:
-          self.load(module)
+          self.do_load(module)
           print("autoloaded module: " + module)
           pass
         except:
@@ -75,9 +97,7 @@ class Lurker(IrcListener):
           pass
         pass
       pass
-    pass
 
-  def start(self):
     self.conn.connect()
     pass
 
@@ -156,9 +176,6 @@ class Lurker(IrcListener):
     return
   pass
 
-class GotDie(Exception): # goto
-  pass
-
 def main():
   irclib.set_silent(False)
   irclib.set_warn(True)
@@ -166,22 +183,9 @@ def main():
   b = Lurker()
   b.start()
 
-  s = ""
-  try:
-    while True:
-      s = raw_input().split(" ", 1)
-      cmd = s[0]
-      if cmd == "load": b.load(s[1])
-      elif cmd == "unload": b.unload(s[1])
-      elif cmd == "reload": b.reload(s[1])
-      elif cmd == "die": raise GotDie()
-      else: print "unknown command!"
-      pass
-    pass
-  except (KeyboardInterrupt, EOFError, GotDie):
-    b.stop()
-    SocketManager.exit()
-    pass
+  b.cmdloop()
+  b.stop()
+  SocketManager.exit()
   pass
 
 if __name__ == "__main__":
