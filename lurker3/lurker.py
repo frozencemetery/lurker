@@ -25,7 +25,7 @@ class Lurker(IrcListener, cmd.Cmd):
   prompt = "=||> "
 
   def postcmd(self, stop, line):
-    if stop or line == "EOF":
+    if stop or line == "EOF" or line == "exit":
       return True
     return False
 
