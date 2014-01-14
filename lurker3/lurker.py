@@ -112,6 +112,23 @@ class Lurker(IrcListener):
       pass
     pass
 
+  def on_priv_msg(self, owner, sender, message, isact):
+    sender = frob_sender(owner, sender)
+    if message[0] == '!':
+      message = message[1:] # del(message[0])
+      msglam = sender[-1]
+      for mod in self.middict.values():
+        if mod.cmdmsg(msglam, channel, sender, message, isact):
+          break
+        pass
+      pass
+    else:
+      for mod in self.moddict.values():
+        mod.regmsg(channel, sender, message, isact)
+        pass
+      pass
+    pass
+
   def on_join(self, owner, sender, channel):
     sender = frob_sender(owner, sender)
     if sender[0] == owner.nick:
