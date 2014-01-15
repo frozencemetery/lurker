@@ -8,7 +8,17 @@ __SILENT = False
 __WARN = False
 __FILE = sys.stdout
 
-ACTION = chr(7) + "ACTION" + chr(7)
+def isaction(s):
+  return s.lower().startswith(chr(1) + "action ") and s[-1] == chr(1)
+
+def unaction(s):
+  if isaction(s):
+    return s[8:-1]
+  else:
+    return s
+
+def toaction(s):
+  return chr(1) + "ACTION " + s + chr(1)
 
 # character classes expressions
 ALPHA = r"[a-zA-Z]"

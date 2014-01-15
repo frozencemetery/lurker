@@ -202,7 +202,7 @@ class IrcConnection(IrcListener):
     send.privmsg = (lambda dst, msg:
                         send.multi("PRIVMSG",dst,":"+msg))
     send.action = (lambda dst, act:
-                       send.privmsg(dst,ircutil.ACTION + act))
+                       send.privmsg(dst,ircutil.toaction(act)))
     send.user = (lambda usr, mode, realname:
                      send.multi("USER",usr,mode,"*",":"+realname))
     send.nick = (lambda nick:
@@ -322,16 +322,16 @@ class IrcConnection(IrcListener):
       pass
 
     elif command.lower() == "privmsg":
-      isact = command.lower().startswith(ircutil.ACTION)
+      isact = ircutil.isaction(paramlist[1])
       # either a channel OR personal message
       if re.match(NICK, paramlist[0]):
         for l in self.Listeners:
-          wrap(l.on_priv_msg, self, sender, paramlist[1], isact)
+          wrap(l.on_priv_msg, self, sender, ircutil.unaction(paramlist[1]), isact)
           pass
         pass
       else:
         for l in self.Listeners:
-          wrap(l.on_chan_msg, self, sender, paramlist[0], paramlist[1], isact)
+          wrap(l.on_chan_msg, self, sender, paramlist[0], ircutil.unaction(paramlist[1]), isact)
           pass
         pass
       pass
