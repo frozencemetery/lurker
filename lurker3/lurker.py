@@ -13,7 +13,9 @@ from irc.irclib import BasicBehavior, SocketManager
 from irc.irclib import IrcConnection, IrcListener
 
 def frob_sender(owner, sender):
-  privlam = lambda message: owner.send.privmsg(sender[0], message)
+  privlam = lambda message, isact=False: \
+      owner.send.privmsg(sender[0], message) if not isact \
+      else owner.send.action(sender[0], message)
   new = list(sender)
   new.append(privlam)
   new = tuple(new)
@@ -117,7 +119,9 @@ class Lurker(IrcListener, cmd.Cmd):
       # http://achewood.com/index.php?date=03042004
 
       message = message[1:] # del(message[0])
-      msglam = lambda message: owner.send.privmsg(channel, message)
+      msglam = lambda message, isact=False: \
+          owner.send.privmsg(channel, message) if not isact \
+          else owner.send.action(channel, message)
       for mod in self.moddict.values():
         if mod.cmdmsg(msglam, channel, sender, message, isact):
           break
