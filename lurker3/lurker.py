@@ -73,11 +73,10 @@ class Lurker(IrcListener, cmd.Cmd):
     cmd.Cmd.__init__(self) # initialize cmd stuff
     pass
 
-  def start(self):
-    # TODO remove hardcoded values here
-    self.conn = IrcConnection("irc.foonetic.net", 6667,
-                              nick="lurker3", user="lurker3")
-    bb = BasicBehavior(["#lurkertest"])
+  def start(self, server, port, nick, user, channel):
+    self.conn = IrcConnection(server, int(port),
+                              nick, user)
+    bb = BasicBehavior([channel])
     self.conn.add_listener(bb)
     self.conn.add_listener(self)
 
@@ -176,12 +175,16 @@ class Lurker(IrcListener, cmd.Cmd):
     return
   pass
 
-def main():
+def main(argv):
+  if len(argv) < 6:
+    print "./lurker.py server port nick user channel"
+    return 1
+
   irclib.set_silent(False)
   irclib.set_warn(True)
   irclib.set_debug(True)
   b = Lurker()
-  b.start()
+  b.start(argv[1], argv[2], argv[3], argv[4], argv[5])
 
   b.cmdloop()
   b.stop()
@@ -189,4 +192,5 @@ def main():
   pass
 
 if __name__ == "__main__":
-  main()
+  main(sys.argv)
+  pass
