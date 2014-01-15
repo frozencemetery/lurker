@@ -3,7 +3,7 @@ import urllib2
 
 from module import *
 
-url = "http://music.furstlabs.com/queue"
+url = "http://music.furstlabs.com/"
 
 def unhtml(m):
   m = urllib2.unquote(m)
@@ -14,10 +14,8 @@ def unhtml(m):
   m = m.replace("/_/", " - ")
   return m
 
-def cmdmsg(senderf, channel, speaker, cmd, isact):
-  if isact or (cmd != "lt" and cmd != "lantunes"):
-    return False
-
+def getqueue():
+  u = url + "queue"
   try:
     m = urllib2.urlopen(url).read().replace('\n', "")
     first = re.search("(?<=class=\"even\">).*?</tr>", m).group(0)
@@ -35,9 +33,27 @@ def cmdmsg(senderf, channel, speaker, cmd, isact):
     album = unhtml(info[2]) if len(info) >= 5 else ""
     album = " [" + album + "]" if album != "N/A" else ""
 
-    senderf(artist + track + album + nptime)
-    return True
+    ret = artist + track + album + nptime
+    pass
   except:
-    senderf("Lanqueue empty or inaccessible!")
+    ret = "Lanqueue empty or inaccessible!"
+    pass
+  return ret
+  
+
+def cmdmsg(senderf, channel, speaker, cmd, isact):
+  if cmd == "lt" or cmd == "lantunes":
+    senderf(getqueue())
     return True
-  pass
+  elif cmd.startswith("lt submit ") or cmd.startswith("lantunes submit "):
+    try:
+      queue = cmd.split(" ", 2)[2]
+      m = urllib2.urlopen(url + "submit", "uri=" + urllib2.quote(queue))
+      m = m.read()
+      senderf(speaker[0] + ": queued to lantunes!")
+      pass
+    except:
+      senderf(speaker[0] + ": failed to queue!")
+      pass
+    return True
+  return False
