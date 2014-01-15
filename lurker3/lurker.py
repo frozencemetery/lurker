@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
 # this loads a lurker interp with CLI interface provided by a backend
-# this backend is a separate module, which is reloadable
 
+import cmd
+import readline
 import sys
 
 import irc.irclib as irclib
@@ -12,17 +13,32 @@ from irc.irclib import BasicBehavior, SocketManager
 from irc.irclib import IrcConnection, IrcListener
 
 def frob_sender(owner, sender):
-  privlam = lambda message: owner.send.privmsg(sender[0], message)
+  privlam = lambda message, isact=False: \
+      owner.send.privmsg(sender[0], message) if not isact \
+      else owner.send.action(sender[0], message)
   new = list(sender)
   new.append(privlam)
   new = tuple(new)
   return new
 
-class Lurker(IrcListener):
+class Lurker(IrcListener, cmd.Cmd):
   moddict = None
   autoloadf = "modules/autoload"
+  prompt = "=||> "
 
-  def load(self, modname):
+  def postcmd(self, stop, line):
+    if stop or line == "EOF" or line == "exit":
+      return True
+    return False
+
+  def do_exit(self, line):
+    print "Exiting..."
+    return
+
+  def do_EOF(self, line):
+    return self.do_exit(line)
+
+  def do_load(self, modname):
     if modname in self.moddict.keys():
       pass
     else:
@@ -34,11 +50,12 @@ class Lurker(IrcListener):
       #   the module named by name. However, when a non-empty fromlist
       #   argument is given, the module named by name is returned.
 
-      self.moddict[modname] = __import__("modules." + modname, fromlist = ["_"])
+      self.moddict[modname] = \
+          __import__("modules." + modname, fromlist = ["_"])
       pass
     pass
 
-  def unload(self, modname):
+  def do_unload(self, modname):
     if modname not in self.moddict.keys():
       pass
     else:
@@ -47,15 +64,21 @@ class Lurker(IrcListener):
       pass
     pass
 
-  def reload(self, modname):
-    self.load(modname) # prevents explosion; nop if loaded
+  def do_reload(self, modname):
+    self.do_load(modname) # prevents explosion; nop if loaded
     reload(self.moddict[modname])
     pass
 
   def __init__(self):
-    self.conn = IrcConnection("irc.foonetic.net", 6667,
-                              nick="lurker3", user="lurker3")
-    bb = BasicBehavior(["#lurkertest"])
+    # Python's multiple inheritance doesn't understand what's going on here,
+    # so we need to be explicit
+    cmd.Cmd.__init__(self) # initialize cmd stuff
+    pass
+
+  def start(self, server, port, nick, user, channel):
+    self.conn = IrcConnection(server, int(port),
+                              nick, user)
+    bb = BasicBehavior([channel])
     self.conn.add_listener(bb)
     self.conn.add_listener(self)
 
@@ -67,7 +90,7 @@ class Lurker(IrcListener):
           continue
 
         try:
-          self.load(module)
+          self.do_load(module)
           print("autoloaded module: " + module)
           pass
         except:
@@ -75,9 +98,7 @@ class Lurker(IrcListener):
           pass
         pass
       pass
-    pass
 
-  def start(self):
     self.conn.connect()
     pass
 
@@ -98,13 +119,32 @@ class Lurker(IrcListener):
       # http://achewood.com/index.php?date=03042004
 
       message = message[1:] # del(message[0])
-      msglam = lambda message: owner.send.privmsg(channel, message)
+      msglam = lambda message, isact=False: \
+          owner.send.privmsg(channel, message) if not isact \
+          else owner.send.action(channel, message)
       for mod in self.moddict.values():
         if mod.cmdmsg(msglam, channel, sender, message, isact):
           break
         pass
       pass
 
+    else:
+      for mod in self.moddict.values():
+        mod.regmsg(channel, sender, message, isact)
+        pass
+      pass
+    pass
+
+  def on_priv_msg(self, owner, sender, message, isact):
+    sender = frob_sender(owner, sender)
+    if message[0] == '!':
+      message = message[1:] # del(message[0])
+      msglam = sender[-1]
+      for mod in self.middict.values():
+        if mod.cmdmsg(msglam, channel, sender, message, isact):
+          break
+        pass
+      pass
     else:
       for mod in self.moddict.values():
         mod.regmsg(channel, sender, message, isact)
@@ -139,33 +179,22 @@ class Lurker(IrcListener):
     return
   pass
 
-class GotDie(Exception): # goto
-  pass
+def main(argv):
+  if len(argv) < 6:
+    print "./lurker.py server port nick user channel"
+    return 1
 
-def main():
   irclib.set_silent(False)
   irclib.set_warn(True)
   irclib.set_debug(True)
   b = Lurker()
-  b.start()
+  b.start(argv[1], argv[2], argv[3], argv[4], argv[5])
 
-  s = ""
-  try:
-    while True:
-      s = raw_input().split(" ", 1)
-      cmd = s[0]
-      if cmd == "load": b.load(s[1])
-      elif cmd == "unload": b.unload(s[1])
-      elif cmd == "reload": b.reload(s[1])
-      elif cmd == "die": raise GotDie()
-      else: print "unknown command!"
-      pass
-    pass
-  except (KeyboardInterrupt, EOFError, GotDie):
-    b.stop()
-    SocketManager.exit()
-    pass
+  b.cmdloop()
+  b.stop()
+  SocketManager.exit()
   pass
 
 if __name__ == "__main__":
-  main()
+  main(sys.argv)
+  pass
