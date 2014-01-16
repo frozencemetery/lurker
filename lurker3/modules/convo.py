@@ -1,12 +1,22 @@
 import random
 import re
 
+from collections import defaultdict
 from module import *
+from ircutil import NICK
 
 convodb = "modules/rsrc/convo.db"
 
 convos = [] # globalize THIS
 lastgrep = {} # remaining convos, associated by location
+lastseen = defaultdict(dict) # last lines, by channel, then user
+lastconvo = None # last convo made
+
+class SeenLine:
+  def __init__(self, message, nick, isact):
+    self.message, self.nick, self.isact = message, nick, isact
+    pass
+  pass
 
 def loaddb():
   global convos
@@ -47,6 +57,40 @@ def nextgrep(channel) :
   fst, lastgrep[channel] = lastgrep[channel][0], lastgrep[channel][1:]
   return fst + (" {1}[+{0}]{1}".format(len(lastgrep[channel]), chr(2)))
 
+def convolast(senderf, channel, pattern):
+  global lastseen
+
+  match = re.match("^(.*?)(" + NICK + ")(.*?)$", pattern)
+  if match:
+    prefix, nick, suffix = match.groups()
+    if nick.lower() in lastseen[channel].keys():
+      last = lastseen[channel][nick.lower()]
+      if last.isact:
+        addconvo("* {0} {1}".format(last.nick, last.message))
+        pass
+      else:
+        if prefix == suffix == "" :
+          addconvo(last.message);
+          pass
+        else:
+          addconvo("{0}{1}{2} {3}".format(prefix, last.nick, suffix, last.message))
+          pass
+        pass
+      senderf("NOW WE'RE HAVING A GOOD TIME RIGHT")
+      pass
+    else:
+      senderf("Could not find nick '{0}'".format(nick))
+      pass
+  else:
+    senderf("Invalid pattern: '{0}'".format(pattern))
+    pass
+  pass
+
+def log(channel, nick, line, isact):
+  global lastseen
+  lastseen[channel][nick.lower()] = SeenLine(line, nick, isact)
+  pass
+
 def writedb():
   with open(convodb, 'w') as f:
     f.write('\n'.join(convos))
@@ -55,14 +99,20 @@ def writedb():
 
 def addconvo(convo):
   global convos
+  global lastconvo
 
   convos.append(convo)
+  lastconvo = convo
   with open(convodb, 'a') as f:
     # since we removed any trailing newline when we loaded, and since our full
     # write does not add one, we should not add one here else we introduce
     # gaps.
     f.write('\n' + convo)
     pass
+  pass
+
+def regmsg(channame, speaker, cmdstr, isact):
+  log(channame, speaker[0], cmdstr, isact)
   pass
 
 def cmdmsg(senderf, channel, speaker, cmd, isact):
@@ -81,6 +131,13 @@ def cmdmsg(senderf, channel, speaker, cmd, isact):
     return True
   elif cmd == "convo next":
     senderf(nextgrep(channel))
+    return True
+  elif cmd.startswith("convo last "):
+    convolast(senderf, channel, cmd.split(" ", 2)[2])
+    return True
+  elif cmd == "convo show":
+    senderf(lastconvo)
+    return True
   return False
 
 def unload():
