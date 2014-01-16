@@ -11,6 +11,8 @@ convos = [] # globalize THIS
 lastgrep = {} # remaining convos, associated by location
 lastseen = defaultdict(dict) # last lines, by channel, then user
 lastconvo = None # last convo made
+lastconvoer = None # last person who convod, to avoid undoing the wrong one
+oldconvos = None # convo before last add operation
 
 class SeenLine:
   def __init__(self, message, nick, isact):
@@ -44,6 +46,7 @@ def grepconvos(channel, regex):
   global convos
   global lastgrep
   matching = filter((lambda line: re.match(".*" + regex + ".*", line, re.IGNORECASE)), convos)
+  random.shuffle(matching)
   lastgrep[channel] = matching
   return nextgrep(channel)
 
@@ -57,7 +60,7 @@ def nextgrep(channel) :
   fst, lastgrep[channel] = lastgrep[channel][0], lastgrep[channel][1:]
   return fst + (" {1}[+{0}]{1}".format(len(lastgrep[channel]), chr(2)))
 
-def convolast(senderf, channel, pattern):
+def convolast(senderf, channel, pattern, speaker):
   global lastseen
 
   match = re.match("^(.*?)(" + NICK + ")(.*?)$", pattern)
@@ -66,14 +69,14 @@ def convolast(senderf, channel, pattern):
     if nick.lower() in lastseen[channel].keys():
       last = lastseen[channel][nick.lower()]
       if last.isact:
-        addconvo("* {0} {1}".format(last.nick, last.message))
+        addconvo("* {0} {1}".format(last.nick, last.message), speaker)
         pass
       else:
         if prefix == suffix == "" :
-          addconvo(last.message);
+          addconvo(last.message, speaker);
           pass
         else:
-          addconvo("{0}{1}{2} {3}".format(prefix, last.nick, suffix, last.message))
+          addconvo("{0}{1}{2} {3}".format(prefix, last.nick, suffix, last.message), speaker)
           pass
         pass
       senderf("NOW WE'RE HAVING A GOOD TIME RIGHT")
@@ -84,6 +87,30 @@ def convolast(senderf, channel, pattern):
   else:
     senderf("Invalid pattern: '{0}'".format(pattern))
     pass
+  pass
+
+def popconvo(senderf, speaker):
+  global convos
+  global oldconvos
+  global lastconvo
+  global lastconvoer
+
+  if convos == []:
+    senderf("YOU CANNOT KILL THAT IS ALREADY DEAD (no convos found)")
+    pass
+  elif lastconvo == None:
+    senderf("No convo found since last reload")
+    pass
+  elif lastconvoer.lower() != speaker[0].lower():
+    senderf("You weren't the last convoer, so you can't undo")
+    pass
+  else:
+    convos = oldconvos
+    writedb()
+    senderf("Deleted: " + lastconvo)
+    z = lastconvo
+    lastconvo = None
+    return z
   pass
 
 def log(channel, nick, line, isact):
@@ -97,12 +124,16 @@ def writedb():
     pass
   pass
 
-def addconvo(convo):
+def addconvo(convo, convoer):
   global convos
   global lastconvo
+  global lastconvoer
+  global oldconvos
 
+  oldconvos = convos[:]
   convos.append(convo)
   lastconvo = convo
+  lastconvoer = convoer
   with open(convodb, 'a') as f:
     # since we removed any trailing newline when we loaded, and since our full
     # write does not add one, we should not add one here else we introduce
@@ -123,7 +154,7 @@ def cmdmsg(senderf, channel, speaker, cmd, isact):
     senderf(getconvo())
     return True
   elif cmd.startswith("convo add "):
-    addconvo(cmd.split(" ", 2)[2])
+    addconvo(cmd.split(" ", 2)[2], speaker[0])
     senderf("NOW WE'RE HAVING A GOOD TIME RIGHT")
     return True
   elif cmd.startswith("convo grep "):
@@ -133,10 +164,18 @@ def cmdmsg(senderf, channel, speaker, cmd, isact):
     senderf(nextgrep(channel))
     return True
   elif cmd.startswith("convo last "):
-    convolast(senderf, channel, cmd.split(" ", 2)[2])
+    convolast(senderf, channel, cmd.split(" ", 2)[2], speaker)
     return True
   elif cmd == "convo show":
-    senderf(lastconvo)
+    if lastconvo:
+      senderf(lastconvo)
+      pass
+    else:
+      senderf("No convo added since last reload")
+      pass
+    return True
+  elif cmd == "convo undo":
+    popconvo(senderf, speaker)
     return True
   return False
 
