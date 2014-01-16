@@ -9,9 +9,15 @@ convos = [] # globalize THIS
 def loaddb():
   global convos
 
-  with open(convodb, 'r') as f:
-    convos = f.read().split('\n')
+  try:
+    with open(convodb, 'r') as f:
+      convos = f.read().split('\n')
+      pass
     pass
+  except:
+    print "Failed to load convo.db; corruption possible!"
+    return
+
   if convos[-1] == "":
     # human editing of this file will introduce a newline because people are
     # sane.  However, python with the join/split functions does not expect
@@ -19,14 +25,17 @@ def loaddb():
     # this array.
     del(convos[-1])
     writedb()
-    return loaddb() # this is a tail call.  Python will ignore this fact.
+    pass
   print "loaded okay"
   pass
 
 def getconvo():
   global convos
 
-  return random.choice(convos)
+  try:
+    return random.choice(convos)
+  except:
+    return "CONVO.DB EMPTY; WORST PARTY EVER"
 
 def writedb():
   with open(convodb, 'w') as f:
