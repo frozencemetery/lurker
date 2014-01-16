@@ -177,6 +177,38 @@ def cmdmsg(senderf, channel, speaker, cmd, isact):
   elif cmd == "convo undo":
     popconvo(senderf, speaker)
     return True
+  elif cmd.startswith("convo fix"):
+    args = cmd.split(" ")[2:]
+    if len(args) > 3 or len(args) < 2:
+      senderf("Bad fix string.")
+      return True
+    if len(args) == 3:
+      try:
+        ct = int(args[2])
+        pass
+      except:
+        enderf("Bad replacement count.")
+        pass
+      pass
+    popmsg = [""]
+    def maybe_print(s):
+      popmsg[0] = s
+      pass
+    last = popconvo(maybe_print, speaker) # gross hack!
+    if last == None:
+      senderf("Failed to pop convo:" + popmsg[0])
+      return True
+    else:
+      if len(args) == 3:
+        newconvo = last.replace(args[0], args[1], ct)
+        pass
+      else:
+        newconvo = last.replace(args[0], args[1])
+        pass
+      addconvo(newconvo, speaker[0])
+      senderf("Updated: " + newconvo)
+      return True
+    pass
   return False
 
 def unload():
