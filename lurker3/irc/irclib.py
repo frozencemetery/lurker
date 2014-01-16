@@ -17,6 +17,16 @@ PREFIXGRP = re.compile(ircutil.PREFIXGRP)
 SPACE = re.compile(ircutil.SPACE)
 NICK = re.compile(ircutil.NICK)
 
+ssl_enabled = False
+try:
+  import ssl
+except ImportError:
+  warn("Couldn't import SSL library -- no SSL support will be provided")
+  pass
+else:
+  ssl_enabled = True
+  pass
+
 # interface for listeners
 class IrcListener(object):
   # called when the owner is created
@@ -169,9 +179,11 @@ class IrcConnection(IrcListener):
   socket = None
   send = None
   _disconnect = False
+  use_ssl = False
 
   def __init__(self, server, port, nick="lurker",
-               user="lurker", realname="Helper P. Lurkington"):
+               user="lurker", realname="Helper P. Lurkington", use_ssl=False):
+    global ssl_enabled
     self.server = server
     self.port = port
     self.nick = nick
@@ -179,6 +191,11 @@ class IrcConnection(IrcListener):
     self.realname = realname
     self.connected = False
     self.registered = False
+    self.use_ssl = use_ssl
+    if use_ssl and not ssl_enabled:
+      warn(("No SSL support, but it was requested for sever {0}:{1}! "
+            "Proceeding with no SSL").format(server, port))
+      pass
 
     self.initialize_sender()
     self.initialize_listeners()
@@ -221,14 +238,22 @@ class IrcConnection(IrcListener):
     pass
 
   def connect(self):
+    global ssl_enabled
     verbose("Calling on_start")
     for l in self.Listeners : wrap(l.on_start,self)
     prnt("== Connecting to remote server %s:%s..." % (self.server, self.port))
     self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    if self.use_ssl and ssl_enabled:
+      self.socket = ssl.wrap_socket(self.socket)
+                          # ca_certs="/etc/ssl/certs/ca-certificates.crt",
+                          # cert_reqs=ssl.CERT_REQUIRED)
+                          # Once I understand what's going wrong with the cert
+                          # verification, I'll uncomment these lines
+      pass
     try:
       self.socket.connect((self.server, self.port))
       pass
-    except Error as e :
+    except Exception as e :
       raise IrcError(e)
     prnt("== Connection successful.")
     self.start_recv_loop()

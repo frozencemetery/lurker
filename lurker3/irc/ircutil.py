@@ -1,4 +1,5 @@
 import sys
+import traceback
 
 global __DEBUG, __VERBOSE, __SILENT, __WARN, __FILE
 
@@ -145,6 +146,6 @@ def wrap(fun, *args, **kwargs):
     fun(*args,**kwargs)
     pass
   except Exception as e:
-    debug("Error in listener:",e)
+    debug("Error in listener:",traceback.format_exc(e))
     pass
   pass
