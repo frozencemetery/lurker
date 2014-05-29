@@ -24,9 +24,10 @@ def toaction(s):
 # character classes expressions
 ALPHA = r"[a-zA-Z]"
 NUM = "[0-9]"
-SPACE = r" +"
+SPACE = r"(?:[ ]+)"
 SPECIAL = r"[\[\]\\`^\{\}_\|]"
 CRLF = r"\r\n"
+HEX = "[0-9A-F]"
 
 # unions of above
 ALPHANUM = "(?:" + ALPHA + "|" + NUM + ")"
@@ -35,10 +36,17 @@ NICKCH = "(?:"+ ALPHA + "|" + NUM + "|" + SPECIAL + "|" + "[-]" + ")"
 INITNICKCH = "(?:"+ ALPHA + "|" + SPECIAL + ")"
 
 # first order tokens
-# this should maybe be... I dunno, something more like `[^ ]+`?
+IPV4ADDR = NUM + "+\." + NUM + "+\." + NUM + "+\." + NUM + "+"
+IPV6ADDR_ = HEX + "+(?:\:" + HEX + "+)+" + "(?:\:IP)?"
+IPV46ADDRA  = "0:0:0:0:0:0:"+ IPV4ADDR
+IPV46ADDRB  = "0:0:0:0:0:FFFF"+ IPV4ADDR
+IPV6ADDR = "(?:(?:" + IPV6ADDR_ + ")|(?:" + "0:0:0:0:0:" + "(?:(?:0)|(?:FFFF)):" + IPV4ADDR + "))"
+
+HOSTADDR = "(?:(?:" + IPV4ADDR +  ")|(?:" + IPV6ADDR + "))"
+HOSTNAME = "(?:" + ALPHANUM + "(?:" + ALPHANUMDASH + "+\.)+" + ALPHANUMDASH + "*" + ALPHANUM + ")"
 HOST =\
-    ALPHANUM + "(?:" + ALPHANUMDASH + "+\.)+" + ALPHANUMDASH + "*" + ALPHANUM
-SERVERNAME = HOST
+    "(?:(?:" + HOSTNAME + ")|(?:" + HOSTADDR + "))"
+SERVERNAME = HOSTNAME
 USER = r"[^ @]+"
 COMMAND = "(?:" + ALPHA + "+|" + NUM * 3 + ")"
 MIDDLE = r"[^\r\n: ][^\r\n ]*"
