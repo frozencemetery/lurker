@@ -190,7 +190,12 @@ def main(argv):
   b = Lurker()
   b.start(argv[1], argv[2], argv[3], argv[4], argv[5], True)
 
-  b.cmdloop()
+  try:
+    b.cmdloop()
+    pass
+  except:
+    print "Exiting"
+    pass
   b.stop()
   SocketManager.exit()
   pass
