@@ -54,7 +54,8 @@ def getconvo():
 def grepconvos(channel, regex):
   global convos
   global lastgrep
-  matching = filter((lambda line: re.match(".*" + regex + ".*", line, re.IGNORECASE)), convos)
+  matching = filter( \
+    (lambda line: re.match(".*" + regex + ".*", line, re.IGNORECASE)), convos)
   random.shuffle(matching)
   lastgrep[channel] = matching
   return nextgrep(channel)
@@ -85,7 +86,8 @@ def convolast(senderf, channel, pattern, speaker):
           addconvo(last.message, speaker);
           pass
         else:
-          addconvo("{0}{1}{2} {3}".format(prefix, last.nick, suffix, last.message), speaker)
+          addconvo("{0}{1}{2} {3}".format( \
+              prefix, last.nick, suffix, last.message), speaker)
           pass
         pass
       senderf("NOW WE'RE HAVING A GOOD TIME RIGHT")

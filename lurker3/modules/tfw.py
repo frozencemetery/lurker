@@ -64,16 +64,25 @@ def cmdmsg(self, channel, channame, speaker, cmd):
     url += cmd
     m = urllib2.urlopen(url).read()
 
-    temp = int(re.search("(?<=<span class=\"temperature\" tempf=\").*?(?=\">)", m).group(0))
-    location = re.search("(?<=<span id=\"locationDisplaySpan\" class=\"small\">).*?(?=</span>)", m).group(0)
+    temp = int(re.search( \
+        "(?<=<span class=\"temperature\" tempf=\").*?(?=\">)", m).group(0))
+    location = re.search( \
+      "(?<=<span id=\"locationDisplaySpan\" class=\"small\">).*?(?=</span>)", \
+        m).group(0)
     status = re.search("(?<=<p class=\"remark\">).*?(?=</p>)", m).group(0)
     paren = re.search("(?<=<p class=\"flavor\">).*?(?=</p>)", m).group(0)
-    dayv = re.search("(?<=<th>DAY</th><th style=\"width:7.5em;\">).*(?=</th>)", m).group(0)
-    highv = re.search("(?<=<th>HIGH</th><td class=\"temperature\" tempf=\").*(?=\r)", m).group(0)
-    lowv = re.search("(?<=<th>LOW</th><td class=\"temperature\" tempf=\").*(?=\r)", m).group(0)
+    dayv = re.search( \
+      "(?<=<th>DAY</th><th style=\"width:7.5em;\">).*(?=</th>)", m).group(0)
+    highv = re.search( \
+      "(?<=<th>HIGH</th><td class=\"temperature\" tempf=\").*(?=\r)", \
+        m).group(0)
+    lowv = re.search( \
+      "(?<=<th>LOW</th><td class=\"temperature\" tempf=\").*(?=\r)", \
+        m).group(0)
     fcv = re.search("(?<=<th>FORECAST</th><td>).*(?=\r)", m).group(0)
 
-    highv = re.search("(?<=<td class=\"temperature\" tempf=\").*", highv).group(0)
+    highv = re.search("(?<=<td class=\"temperature\" tempf=\").*", \
+                        highv).group(0)
     tempha = int(re.search(".*?(?=\">)", highv).group(0))
     highv = re.search("(?<=tempf=\").*", highv).group(0)
     templa = int(re.search(".*?(?=\">)", lowv).group(0))
@@ -87,7 +96,13 @@ def cmdmsg(self, channel, channame, speaker, cmd):
     templb = int(re.search(".*?(?=\">)", lowv).group(0))
     fcb = re.search(".*?(?=</td>)", fcv).group(0)
 
-    magic = "\x02" + location + "\x0F: " + str(temp) + " F (" + str(coff(temp)) + " C) | " + status + " (" + paren + ") | " + daya + ": High " + str(tempha) + " F (" + str(coff(tempha)) + " C), Low " + str(templa) + " F (" + str(coff(templa)) + " C).  " + fca + " | " + dayb + ": High " + str(temphb) + " F (" + str(coff(temphb)) + " C), Low " + str(templb) + " F (" + str(coff(templb)) + " C).  " + fcb
+    magic = "\x02" + location + "\x0F: " + str(temp) + " F (" + \
+        str(coff(temp)) + " C) | " + status + " (" + paren + ") | " + daya + \
+        ": High " + str(tempha) + " F (" + str(coff(tempha)) + " C), Low " + \
+        str(templa) + " F (" + str(coff(templa)) + " C).  " + fca + " | " + \
+        dayb + ": High " + str(temphb) + " F (" + str(coff(temphb)) + \
+        " C), Low " + str(templb) + " F (" + str(coff(templb)) + " C).  " + \
+        fcb
     magic = magic.replace("ITS", "IT'S")
 
     channel.msg(magic)

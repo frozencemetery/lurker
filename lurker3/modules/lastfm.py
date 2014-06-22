@@ -56,7 +56,8 @@ def cmdmsg(senderf, channame, speaker, cmdstr, isact):
         u = users[speaker[0]]
         pass
       except:
-        senderf("Syntax is `!fm username`.  If you have invoked `!fm set username`, you may invoke `!fm`.")
+        senderf("Syntax is `!fm username`.  "
+                "If you have invoked `!fm set username`, you may invoke `!fm`.")
         return True
       pass
 

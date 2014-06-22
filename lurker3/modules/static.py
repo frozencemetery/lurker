@@ -1,10 +1,12 @@
 from module import *
 
+S="ssssssssssssSSSSSSSSSSSSHHHHHHHHHHHHHHHHHHHHHHHHHHHHHhsssssssssssssssssssss"
+
 def cmdmsg(senderf, channel, speaker, cmd, isact):
     if isact:
         return False
     if cmd == "static":
-        senderf("ssssssssssssSSSSSSSSSSSSHHHHHHHHHHHHHHHHHHHHHHHHHHHHHhsssssssssssssssssssss")
+        senderf(S)
         return True
     return False
 
