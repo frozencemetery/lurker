@@ -1,3 +1,4 @@
+import random
 import re
 import select
 import socket
@@ -173,6 +174,41 @@ class SocketManager(threading.Thread):
       return cls._singleton
     pass
 
+class PingDetector(threading.Thread):
+  def __init__(self, connection):
+    self.connection = connection
+    threading.Thread.__init__(self)
+    pass
+
+  def run(self):
+    while True:
+      time.sleep(10)
+      ping_str = "PD" + str(random.randrange(10,10000000))
+      try:
+        if self.connection.connected:
+          if self.connection.last_recv > (time.time() - 9):
+            continue
+          self.connection.send.ping(ping_str)
+        else:
+          prnt("[PD] Client not connected yet, waiting")
+          continue
+        pass
+      except Exception as e:
+        prnt("[PD] Error while pinging! Reconnecting (%s)" % e)
+        self.connection.disconnect()
+        self.connection.reconnect_attempt()
+        pass
+      time.sleep(3)
+      if self.connection.last_pong != ping_str:
+        prnt("[PD] Pingout (last pong sent = %s, recvd = %s)! Reconnecting" %
+            (self.connection.last_pong, ping_str))
+        self.connection.disconnect()
+        self.connection.reconnect_attempt()
+        pass
+      pass
+    pass
+  pass
+
 RECONNECT_DELAY = 15
 # represents a connection to a single irc server. attach classes which
 # implement IrcListener to make it do a thing
@@ -205,6 +241,8 @@ class IrcConnection(IrcListener):
     self.registered = False
     self.use_ssl = use_ssl
     self.reconnect_delay = RECONNECT_DELAY
+    self.last_recv = 0
+    self.last_pong = ""
     if use_ssl and not ssl_enabled:
       warn(("No SSL support, but it was requested for sever {0}:{1}! "
             "Proceeding with no SSL").format(server, port))
@@ -213,6 +251,9 @@ class IrcConnection(IrcListener):
     self.initialize_sender()
     self.initialize_listeners()
     self.add_listener(self)
+    self.pinger = PingDetector(self)
+    self.pinger.daemon = True
+    self.pinger.start()
     pass
 
   # make new listener queues
@@ -229,6 +270,8 @@ class IrcConnection(IrcListener):
                       send.raw(" ".join(str(arg) for arg in args)))
     send.pong = (lambda cnt:
                      send.multi("PONG",":"+cnt))
+    send.ping = (lambda cnt:
+                     send.multi("PING",":"+cnt))
     send.privmsg = (lambda dst, msg:
                         send.multi("PRIVMSG",dst,":"+msg))
     send.action = (lambda dst, act:
@@ -246,8 +289,9 @@ class IrcConnection(IrcListener):
     prnt("== Disconnecting from remote server %s..." % self.server)
     SocketManager.remove(self.socket)
     self._disconnect = True
+    self.connected = False
     self.socket.close()
-    prnt("== Disconneced. Socket closed.")
+    prnt("== Disconnected. Socket closed.")
     pass
 
   def begin_reconnect(self):
@@ -295,6 +339,7 @@ class IrcConnection(IrcListener):
     SocketManager.add(self.socket, self.on_recv)
     pass
 
+  # actually called on a recv or an error
   def on_recv(self):
     try:
       buff = self.socket.recv(256)
@@ -311,6 +356,7 @@ class IrcConnection(IrcListener):
       self.disconnect()
       self.begin_reconnect()
       return
+    self.last_recv = time.time()
     lines = self.line_buffer.split('\r\n')
     for line in lines[:-1]:
       try:
@@ -452,6 +498,10 @@ class IrcConnection(IrcListener):
       for l in self.Listeners:
         wrap(l.on_quit, self, sender, message)
         pass
+      pass
+    elif command.lower() == "pong":
+      debug("Got pong from server: %s" % paramlist[1])
+      self.last_pong = paramlist[1]
       pass
     else:
       raise IrcError("Unknown command: " + str(command))
