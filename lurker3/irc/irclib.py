@@ -1,7 +1,10 @@
 import re
 import select
 import socket
+# yeah we do want both
+import thread
 import threading
+import time
 
 import ircutil
 from ircutil import UncasedDict, IrcSender, wrap, IrcError
@@ -84,6 +87,10 @@ class IrcListener(object):
   # called when someone quits a server
   def on_quit(self, owner, sender, message):
     pass
+
+  # called when the server times out
+  def on_err(self):
+    pass
   pass
 
 class BasicBehavior(IrcListener):
@@ -118,6 +125,9 @@ class SocketManager(threading.Thread):
     while True:
       readable, writable, error = select.select(self.sockets.keys(),[],[],0.1)
       for sock in readable:
+        self.sockets[sock]()
+        pass
+      for sock in error:
         self.sockets[sock]()
         pass
       while len(self.queue) > 0:
@@ -163,6 +173,7 @@ class SocketManager(threading.Thread):
       return cls._singleton
     pass
 
+RECONNECT_DELAY = 15
 # represents a connection to a single irc server. attach classes which
 # implement IrcListener to make it do a thing
 class IrcConnection(IrcListener):
@@ -180,6 +191,7 @@ class IrcConnection(IrcListener):
   send = None
   _disconnect = False
   use_ssl = False
+  reconnect_delay = 0
 
   def __init__(self, server, port, nick="lurker",
                user="lurker", realname="Helper P. Lurkington", use_ssl=False):
@@ -192,6 +204,7 @@ class IrcConnection(IrcListener):
     self.connected = False
     self.registered = False
     self.use_ssl = use_ssl
+    self.reconnect_delay = RECONNECT_DELAY
     if use_ssl and not ssl_enabled:
       warn(("No SSL support, but it was requested for sever {0}:{1}! "
             "Proceeding with no SSL").format(server, port))
@@ -237,6 +250,19 @@ class IrcConnection(IrcListener):
     prnt("== Disconneced. Socket closed.")
     pass
 
+  def begin_reconnect(self):
+    thread.start_new_thread(self.reconnect_attempt, ())
+    pass
+
+  def reconnect_attempt(self):
+    time.sleep(self.reconnect_delay)
+    self.reconnect_delay *= 2
+    if self.reconnect_delay > 15 * 60:
+      self.reconnect_delay = 15 * 60
+    prnt("== Attempting reconnect")
+    self.connect()
+    pass
+
   def connect(self):
     global ssl_enabled
     verbose("Calling on_start")
@@ -254,8 +280,12 @@ class IrcConnection(IrcListener):
       self.socket.connect((self.server, self.port))
       pass
     except Exception as e :
-      raise IrcError(e)
+      prnt("== Exception connecting to irc server, retrying in %d seconds: %s" % (
+          self.reconnect_delay, e))
+      self.begin_reconnect()
+      return
     prnt("== Connection successful.")
+    self.reconnect_delay = RECONNECT_DELAY
     self.start_recv_loop()
     pass
 
@@ -267,10 +297,20 @@ class IrcConnection(IrcListener):
 
   def on_recv(self):
     try:
-      self.line_buffer += self.socket.recv(256)
+      buff = self.socket.recv(256)
+      if buff == '':
+        # empty == some kind of error, probably die
+        prnt("Got no data from server, disconnecting and attempting reconnect")
+        self.disconnect()
+        self.begin_reconnect()
+        return
+      self.line_buffer += buff
       pass
     except Exception as e:
-      raise IrcError(e)
+      prnt("Error recieving data, disconnecting and attempting reconnect: %s" % e)
+      self.disconnect()
+      self.begin_reconnect()
+      return
     lines = self.line_buffer.split('\r\n')
     for line in lines[:-1]:
       try:
@@ -429,6 +469,11 @@ class IrcConnection(IrcListener):
 
   def on_ping(self, owner, sender, contents):
     owner.send.pong(contents)
+    pass
+
+  def on_err(self):
+    self.disconnect()
+    self.begin_reconnect()
     pass
   pass
 
