@@ -140,14 +140,14 @@ class Lurker(IrcListener, cmd.Cmd):
     if message[0] == '!':
       message = message[1:] # del(message[0])
       msglam = sender[-1]
-      for mod in self.middict.values():
-        if mod.cmdmsg(msglam, channel, sender, message, isact):
+      for mod in self.moddict.values():
+        if mod.cmdmsg(msglam, sender, sender, message, isact):
           break
         pass
       pass
     else:
       for mod in self.moddict.values():
-        mod.regmsg(channel, sender, message, isact)
+        mod.regmsg(sender, sender, message, isact)
         pass
       pass
     pass
