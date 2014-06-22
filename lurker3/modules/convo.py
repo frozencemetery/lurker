@@ -33,10 +33,10 @@ def loaddb():
     return
 
   if convos[-1] == "":
-    # human editing of this file will introduce a newline because people are
-    # sane.  However, python with the join/split functions does not expect
-    # this newline, and kindly makes a mess on the floor when it goes to use
-    # this array.
+    # human and lurker editing of this file will introduce a newline because
+    # people are sane.  However, python with the join/split functions does not
+    # expect this newline, and kindly makes a mess on the floor when it goes
+    # to use this array.
     del(convos[-1])
     writedb()
     pass
@@ -129,7 +129,7 @@ def log(channel, nick, line, isact):
 
 def writedb():
   with open(convodb, 'w') as f:
-    f.write('\n'.join(convos))
+    f.write('\n'.join(convos)[1:])
     pass
   pass
 
@@ -144,10 +144,7 @@ def addconvo(convo, convoer):
   lastconvo = convo
   lastconvoer = convoer
   with open(convodb, 'a') as f:
-    # since we removed any trailing newline when we loaded, and since our full
-    # write does not add one, we should not add one here else we introduce
-    # gaps.
-    f.write('\n' + convo)
+    f.write(convo + '\n')
     pass
   pass
 
