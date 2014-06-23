@@ -30,11 +30,11 @@ def writedb():
 def maybe_alert(user):
   global alerts
 
-  user[0] = user[0].lower()
+  u = user[0].lower()
   sentalert = False
   try:
-    while alerts[user[0]] is not None:
-      user[-1](alerts[user[0]].pop())
+    while alerts[u] is not None:
+      user[-1](alerts[u].pop())
       sentalert = True
       pass
     pass
@@ -66,8 +66,8 @@ def cmdmsg(senderf, channame, speaker, cmdstr, isact):
     except:
       alerts[user] = [msg]
       pass
+    senderf("Reminder saved!")
     pass
-  senderf("Reminder saved!")
   return
 
 def regmsg(channame, speaker, cmdstr, isact):
