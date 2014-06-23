@@ -65,6 +65,7 @@ def cmdmsg(senderf, channame, speaker, cmdstr, isact):
       alerts[user] = [msg]
       pass
     pass
+  senderf("Reminder saved!")
   return
 
 def regmsg(channame, speaker, cmdstr, isact):
