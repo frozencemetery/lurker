@@ -30,6 +30,7 @@ def writedb():
 def maybe_alert(user):
   global alerts
 
+  user[0] = user[0].lower()
   sentalert = False
   try:
     while alerts[user[0]] is not None:
@@ -57,6 +58,7 @@ def cmdmsg(senderf, channame, speaker, cmdstr, isact):
   rem += time.strftime(" at %Y-%m-%d %H:%M:%S")
   if cmdstr.startswith("alert "):
     _, user, msg = cmdstr.split(" ", 2)
+    user = user.lower()
     msg = rem + " told me to tell you " + msg
     try:
       alerts[user].append(msg)
