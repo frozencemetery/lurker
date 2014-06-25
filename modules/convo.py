@@ -112,7 +112,7 @@ def popconvo(senderf, speaker):
   elif lastconvo == None:
     senderf("No convo found since last reload")
     pass
-  elif lastconvoer.lower() != speaker[0].lower():
+  elif lastconvoer[0].lower() != speaker[0].lower():
     senderf("You weren't the last convoer, so you can't undo")
     pass
   else:
