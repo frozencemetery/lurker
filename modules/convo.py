@@ -131,7 +131,7 @@ def log(channel, nick, line, isact):
 
 def writedb():
   with open(convodb, 'w') as f:
-    f.write('\n'.join(convos)[1:] + '\n')
+    f.write('\n'.join(convos) + '\n')
     pass
   pass
 
