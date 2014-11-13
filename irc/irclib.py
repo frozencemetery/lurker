@@ -124,7 +124,7 @@ class SocketManager(threading.Thread):
 
   def run(self):
     while True:
-      readable, writable, error = select.select(self.sockets.keys(),[],[],0.1)
+      readable, writable, error = select.select(self.sockets.keys(),[],self.sockets.keys(), 1)
       for sock in readable:
         self.sockets[sock]()
         pass
@@ -182,7 +182,7 @@ class PingDetector(threading.Thread):
 
   def run(self):
     while True:
-      time.sleep(10)
+      time.sleep(300)
       ping_str = "PD" + str(random.randrange(10,10000000))
       try:
         if self.connection.connected:
@@ -198,10 +198,10 @@ class PingDetector(threading.Thread):
         self.connection.disconnect()
         self.connection.reconnect_attempt()
         pass
-      time.sleep(3)
+      time.sleep(30)
       if self.connection.last_pong != ping_str:
         prnt("[PD] Pingout (last pong sent = %s, recvd = %s)! Reconnecting" %
-            (self.connection.last_pong, ping_str))
+            (ping_str, self.connection.last_pong))
         self.connection.disconnect()
         self.connection.reconnect_attempt()
         pass
@@ -290,6 +290,7 @@ class IrcConnection(IrcListener):
     SocketManager.remove(self.socket)
     self._disconnect = True
     self.connected = False
+    self.registered = False
     self.socket.close()
     prnt("== Disconnected. Socket closed.")
     pass
