@@ -112,7 +112,7 @@ def popconvo(senderf, speaker):
   elif lastconvo == None:
     senderf("No convo found since last reload")
     pass
-  elif lastconvoer[0].lower() != speaker[0].lower():
+  elif lastconvoer.lower() != speaker[0].lower():
     senderf("You weren't the last convoer, so you can't undo")
     pass
   else:
@@ -172,7 +172,7 @@ def cmdmsg(senderf, channel, speaker, cmd, isact):
     senderf(nextgrep(channel))
     return True
   elif cmd.startswith("convo last "):
-    convolast(senderf, channel, cmd.split(" ", 2)[2], speaker)
+    convolast(senderf, channel, cmd.split(" ", 2)[2], speaker[0])
     return True
   elif cmd == "convo show":
     if lastconvo:

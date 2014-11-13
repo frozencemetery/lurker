@@ -81,6 +81,10 @@ class IrcListener(object):
   def on_user_mode(self, owner, sender, mode):
     pass
 
+  # called when someone changes their nick
+  def on_nick(self, owner, sender, newnick):
+    pass
+
   # called when someone leaves a channel
   def on_part(self, owner, sender, channel, message):
     pass
@@ -501,9 +505,13 @@ class IrcConnection(IrcListener):
         pass
       pass
     elif command.lower() == "pong":
-      debug("Got pong from server: %s" % paramlist[1])
       self.last_pong = paramlist[1]
       pass
+    elif command.lower() == "nick":
+      if len(paramlist) > 0:
+        message = paramlist[0]
+        for l in self.Listeners:
+          wrap(l.on_nick, self, sender, message)
     else:
       raise IrcError("Unknown command: " + str(command))
     pass
