@@ -35,10 +35,16 @@ def writedb():
 def cmdmsg(senderf, channel, speaker, cmd, isact):
   global unhugged
 
-  if cmd == "hug me never" and speaker[0] not in unhugged:
-    unhugged.append(speaker[0])
-    writedb()
-    senderf(speaker[0] + ": I will remember that")
+  if cmd == "hug me never":
+    if speaker[0] not in unhugged:
+      unhugged.append(speaker[0])
+      writedb()
+      senderf(speaker[0] + ": I will remember that")
+      pass
+    else:
+      senderf(speaker[0] + ": psh, like I'd forget a thing like that")
+      pass
+    pass
   elif cmd.startswith("hug "):
     name = cmd.split(" ", 1)[1]
     if name == "me":
