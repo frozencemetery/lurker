@@ -31,42 +31,48 @@ def coff(f):
 def cmdmsg(senderf, channame, speaker, cmdstr, isact):
   global lookup
 
-  try:
-    if cmdstr == "fw":
+
+  if cmdstr == "fw":
+    try:
       name = lookup[speaker[0]]
-
-      switch = random.randint(1,30)
-      if switch == 1:
-        senderf("IT'S RAINING MEN")
-        return True
-      elif switch == 2:
-        senderf("CHOCOLATE RAIN")
-        return True
-      elif switch == 3:
-        senderf("Cloudy.  With a chance of meatballs.")
-        return True
       pass
-    elif cmdstr.startswith("fw set "):
-      name = cmdstr.split(" ", 2)[2]
-      lookup[speaker[0]] = name
-      pass
-    elif cmdstr.startswith("fw "):
-      name = cmdstr.split(" ", 1)[1]
+    except:
+      senderf(speaker[0] + ": I don't know your location!  Try `!fw set place`.")
+      return True
 
-      switch = random.randint(1,30)
-      if switch == 1:
-        senderf("IT'S RAINING MEN")
-        return True
-      elif switch == 2:
-        senderf("CHOCOLATE RAIN")
-        return True
-      elif switch == 3:
-        senderf("Cloudy.  With a chance of meatballs.")
-        return True
-      pass
-    else:
-      return False
+    switch = random.randint(1,30)
+    if switch == 1:
+      senderf("IT'S RAINING MEN")
+      return True
+    elif switch == 2:
+      senderf("CHOCOLATE RAIN")
+      return True
+    elif switch == 3:
+      senderf("Cloudy.  With a chance of meatballs.")
+      return True
+    pass
+  elif cmdstr.startswith("fw set "):
+    name = cmdstr.split(" ", 2)[2]
+    lookup[speaker[0]] = name
+    pass
+  elif cmdstr.startswith("fw "):
+    name = cmdstr.split(" ", 1)[1]
 
+    switch = random.randint(1,30)
+    if switch == 1:
+      senderf("IT'S RAINING MEN")
+      return True
+    elif switch == 2:
+      senderf("CHOCOLATE RAIN")
+      return True
+    elif switch == 3:
+      senderf("Cloudy.  With a chance of meatballs.")
+      return True
+    pass
+  else:
+    return False
+
+  try:
     url = "http://thefuckingweather.com/?where="
     name = urllib2.quote(name)
     url += name
