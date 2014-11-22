@@ -1,6 +1,6 @@
 import time
 
-import cPickle as P
+import json as J
 
 from module import *
 
@@ -12,7 +12,7 @@ def loaddb():
 
   try:
     with open(alertdb, 'r') as f:
-      alerts = P.load(f)
+      alerts = J.load(f)
     pass
   except:
     print "failed to load alerts.db; corruption possible!"
@@ -23,7 +23,7 @@ def writedb():
   global alerts
 
   with open(alertdb, 'w') as f:
-    P.dump(alerts, f)
+    J.dump(alerts, f)
     pass
   return
 

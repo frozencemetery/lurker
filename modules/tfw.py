@@ -1,24 +1,25 @@
 import urllib2
 import re
-import cPickle
 import random
+
+import json as J
 
 dictlocat = "rsrc/tfw.dict"
 lookup = {}
 
 f = open(dictlocat, 'r')
-lookup = cPickle.load(f)
+lookup = J.load(f)
 f.close()
 
 def loaddict(self):
   f = open(dictlocat, 'r')
-  self.lookup = cPickle.load(f)
+  self.lookup = J.load(f)
   f.close()
   pass
 
 def writedict(self):
   f = open(dictlocat, 'w')
-  cPickle.dump(self.lookup, f)
+  J.dump(self.lookup, f)
   f.close()
   pass
 

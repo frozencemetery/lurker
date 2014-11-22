@@ -2,7 +2,7 @@ import re
 import urllib
 import urllib2
 
-import cPickle as P
+import json as J
 
 from module import *
 
@@ -14,7 +14,7 @@ def loaddict():
 
   try:
     with open(lastfmdict, 'r') as f:
-      users = P.load(f)
+      users = J.load(f)
       pass
   except:
     print "failed to load lastfm.dict; corruption possible!"
@@ -25,7 +25,7 @@ def writedb():
   global users
 
   with open(lastfmdict, 'w') as f:
-    P.dump(users, f)
+    J.dump(users, f)
     pass
   return
 

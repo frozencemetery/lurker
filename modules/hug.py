@@ -1,4 +1,4 @@
-import cPickle as P
+import json as J
 
 from module import *
 
@@ -11,7 +11,7 @@ def loaddb():
 
   try:
     with open(nohugs_file, 'r') as f:
-      unhugged = P.load(f)
+      unhugged = J.load(f)
       pass
     pass
   except:
@@ -24,7 +24,7 @@ def writedb():
 
   try:
     with open(nohugs_file, 'w') as f:
-      P.dump(unhugged, f)
+      J.dump(unhugged, f)
       pass
     pass
   except:
