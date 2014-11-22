@@ -23,6 +23,9 @@ def writedict(self):
   f.close()
   pass
 
+def coff(f):
+   return str(int( (int(f) - 32.0) * 5 / 9 ))
+
 def cmdmsg(self, channel, channame, speaker, cmd):
   try:
     if cmd == "fw":
@@ -61,8 +64,8 @@ def cmdmsg(self, channel, channame, speaker, cmd):
       return False
 
     url = "http://thefuckingweather.com/?where="
-    name = urllib2.quote(cmd)
-    url += cmd
+    name = urllib2.quote(name)
+    url += name
     m = urllib2.urlopen(url).read()
 
     temp = int(re.search( \
@@ -108,10 +111,11 @@ def cmdmsg(self, channel, channame, speaker, cmd):
 
     channel.msg(magic)
     pass
-
   except:
-    return False
+    channel.msg("The weather machine is probably broken, sorry.")
+    return True
   pass
+
 
 def unload(self):
   self.writedict()
