@@ -47,7 +47,7 @@ def cmdmsg(senderf, channel, speaker, cmd, isact):
     pass
   elif cmd.startswith("hug "):
     name = cmd.split(" ", 1)[1]
-    if name == "me":
+    if name.strip() == "me":
       name = speaker[0]
       pass
     if name not in unhugged:
