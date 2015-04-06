@@ -1,9 +1,9 @@
 * General repository management
-[ ] Add more information about lurker to the README
-[ ] Add build/installation instructions
-[ ] Add build/installation scripting
-[ ] Add coding guidelines
-[ ] Fix existing code to meet above guidelines
+- [ ] Add more information about lurker to the README
+- [ ] Add build/installation instructions
+- [ ] Add build/installation scripting
+- [ ] Add coding guidelines
+- [ ] Fix existing code to meet above guidelines
 * Features
-[ ] Create this list
+- [ ] Create this list
 * Known issues
