@@ -66,6 +66,7 @@ def cmdmsg(senderf, channame, speaker, cmdstr, isact):
     except:
       alerts[user] = [msg]
       pass
+    writedb()
     senderf("Reminder saved!")
     pass
   return
