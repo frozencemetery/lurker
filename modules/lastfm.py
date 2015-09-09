@@ -61,12 +61,10 @@ def cmdmsg(senderf, channame, speaker, cmdstr, isact):
         return True
       pass
 
-    url = "http://ws.audioscrobbler.com/1.0/user/" + u + "/recenttracks.rss"
-    response = urllib2.urlopen(url)
-    urlload = response.read()
-    m = re.search("(?<=/music/).*?(?=</link>)", urlload).group(0)
-    ct = unhtml(m)
-    senderf(speaker[0] + ": " + ct)
+    url = "http://www.last.fm/user/" + u + "/library"
+    response = urllib2.urlopen(url).read()
+    m = re.search("(?<=/music/)(.*?)/.*/(.*?)(?=\")", response)
+    senderf(speaker[0] + ": " + unhtml(m.group(1)) + " - " + unhtml(m.group(2)))
     pass
   return False
 
