@@ -64,7 +64,7 @@ def cmdmsg(senderf, channame, speaker, cmdstr, isact):
     url = "http://www.last.fm/user/" + u
     response = urllib2.urlopen(url).read()
     response = response[response.index("Recent") + len("Recent"):]
-    m = re.search("(?<=/music/)(.*?)/.*/(.*?)(?=\")", response)
+    m = re.search("(?<=/music/)([^/]*)/[^/]*/([^/]*?)(?=\")", response)
     senderf(speaker[0] + ": " + unhtml(m.group(1)) + " - " + unhtml(m.group(2)))
     pass
   return False
