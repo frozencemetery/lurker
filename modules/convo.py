@@ -195,7 +195,7 @@ def cmdmsg(senderf, channel, speaker, cmd, isact):
         ct = int(args[2])
         pass
       except:
-        enderf("Bad replacement count.")
+        senderf("Bad replacement count.")
         pass
       pass
     popmsg = [""]
