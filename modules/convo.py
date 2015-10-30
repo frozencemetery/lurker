@@ -166,7 +166,12 @@ def cmdmsg(senderf, channel, speaker, cmd, isact):
     senderf("NOW WE'RE HAVING A GOOD TIME RIGHT")
     return True
   elif cmd.startswith("convo grep "):
-    senderf(grepconvos(channel, cmd.split(" ", 2)[2]))
+    try:
+      senderf(grepconvos(channel, cmd.split(" ", 2)[2]))
+      pass
+    except:
+      senderf(speaker[0] + ": PYTHON REGEX DO YOU SPEAK IT")
+      pass
     return True
   elif cmd == "convo next":
     senderf(nextgrep(channel))
