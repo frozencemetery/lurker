@@ -69,7 +69,7 @@ def cmdmsg(senderf, channame, speaker, cmdstr, isact):
     writedb()
     senderf("Reminder saved!")
     pass
-  return
+  return True
 
 def regmsg(channame, speaker, cmdstr, isact):
   return maybe_alert(speaker)
