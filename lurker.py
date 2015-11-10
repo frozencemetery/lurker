@@ -122,9 +122,15 @@ class Lurker(IrcListener, cmd.Cmd):
       msglam = lambda message, isact=False: \
           owner.send.privmsg(channel, message) if not isact \
           else owner.send.action(channel, message)
+      acted = False
       for mod in self.moddict.values():
-        if mod.cmdmsg(msglam, channel, sender, message, isact):
+        acted = mod.cmdmsg(msglam, channel, sender, message, isact)
+        if acted:
           break
+        pass
+      if not acted:
+        msglam("HELP I DON'T KNOW HOW TO %s!" %
+               message.split(" ", 1)[0].upper())
         pass
       pass
 
@@ -140,9 +146,15 @@ class Lurker(IrcListener, cmd.Cmd):
     if message[0] == '!':
       message = message[1:] # del(message[0])
       msglam = sender[-1]
+      acted = False
       for mod in self.moddict.values():
-        if mod.cmdmsg(msglam, sender[0], sender, message, isact):
+        acted = mod.cmdmsg(msglam, sender[0], sender, message, isact)
+        if acted:
           break
+        pass
+      if not acted:
+        msglam("HELP I DON'T KNOW HOW TO %s!" %
+               message.split(" ", 1)[0].upper())
         pass
       pass
     else:
