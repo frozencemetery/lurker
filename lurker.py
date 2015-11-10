@@ -129,8 +129,7 @@ class Lurker(IrcListener, cmd.Cmd):
           break
         pass
       if not acted:
-        msglam("HELP I DON'T KNOW HOW TO %s!" %
-               message.split(" ", 1)[0].upper())
+        msglam("HELP I DON'T KNOW HOW TO %s!" % message.upper())
         pass
       pass
 
@@ -153,8 +152,7 @@ class Lurker(IrcListener, cmd.Cmd):
           break
         pass
       if not acted:
-        msglam("HELP I DON'T KNOW HOW TO %s!" %
-               message.split(" ", 1)[0].upper())
+        msglam("HELP I DON'T KNOW HOW TO %s!" % message.upper())
         pass
       pass
     else:
