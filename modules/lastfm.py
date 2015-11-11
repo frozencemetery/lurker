@@ -66,7 +66,7 @@ def cmdmsg(senderf, channame, speaker, cmdstr, isact):
     response = response[response.index("Recent") + len("Recent"):]
     m = re.search("(?<=/music/)([^/\n]*)/[^/\n]*/([^/\n]*?)(?=\")", response)
     senderf(speaker[0] + ": " + unhtml(m.group(1)) + " - " + unhtml(m.group(2)))
-    pass
+    return True
   return False
 
 def unload():
