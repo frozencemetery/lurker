@@ -75,10 +75,10 @@ class Lurker(IrcListener, cmd.Cmd):
     cmd.Cmd.__init__(self) # initialize cmd stuff
     pass
 
-  def start(self, server, port, nick, user, channel, ssl):
+  def start(self, server, port, nick, user, channels, ssl):
     self.conn = IrcConnection(server, int(port),
                               nick, user, use_ssl=ssl)
-    bb = BasicBehavior([channel])
+    bb = BasicBehavior(channels)
     self.conn.add_listener(bb)
     self.conn.add_listener(self)
 
@@ -219,7 +219,7 @@ def main(argv):
     return 1
 
   b = Lurker()
-  b.start(argv[1], argv[2], argv[3], argv[4], argv[5], True)
+  b.start(argv[1], argv[2], argv[3], argv[4], argv[5:], True)
 
   try:
     b.cmdloop()
