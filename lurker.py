@@ -190,13 +190,6 @@ class Lurker(IrcListener, cmd.Cmd):
   pass
 
 def main(argv):
-  if len(argv) < 6:
-    print "./lurker.py [args] server port nick user channel"
-    print "args: -s :: make lurker silent (no output)"
-    print "args: -w :: disable warnings (superseded by -s)"
-    print "args: -d :: enable debug spew (default off)"
-    return 1
-
   irclib.set_silent(False)
   irclib.set_warn(True)
   irclib.set_debug(False)
@@ -217,6 +210,13 @@ def main(argv):
     else:
       break
     pass
+
+  if len(argv) < 6:
+    print "./lurker.py [args] server port nick user [channel...]"
+    print "args: -s :: make lurker silent (no output)"
+    print "args: -w :: disable warnings (superseded by -s)"
+    print "args: -d :: enable debug spew (default off)"
+    return 1
 
   b = Lurker()
   b.start(argv[1], argv[2], argv[3], argv[4], argv[5], True)
