@@ -199,7 +199,7 @@ def cmdmsg(senderf, channel, speaker, cmd, isact):
     (original, trash, substitution, more_trash, option) = match.groups()
     popmsg = [""]
     original += trash
-    substitution += more_trash
+    substitution = re.escape(substitution + more_trash)
     def maybe_print(s):
       popmsg[0] = s
       pass
