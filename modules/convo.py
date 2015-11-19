@@ -191,38 +191,47 @@ def cmdmsg(senderf, channel, speaker, cmd, isact):
     popconvo(senderf, speaker)
     return True
   elif cmd.startswith("convo fix"):
-    args = cmd.split(" ")[2:]
-    if len(args) > 3 or len(args) < 2:
-      senderf("Bad fix string.")
+    FUCKSTICK = "s/(.*?)(?<!\\\\)((?:\\\\\\\\)*)\/(.*?)(?<!\\\\)((?:\\\\\\\\)*)\/(g?)$"
+    match = re.match(FUCKSTICK, cmd[10:])
+    if not match:
+      senderf("FUCKSTICK says NO")
       return True
-    if len(args) == 3:
-      try:
-        ct = int(args[2])
-        pass
-      except:
-        senderf("Bad replacement count.")
-        pass
-      pass
+    (original, trash, substitution, more_trash, option) = match.groups()
     popmsg = [""]
+    original += trash
+    substitution += more_trash
     def maybe_print(s):
       popmsg[0] = s
       pass
+    # note: i no longer know what this does? - cstanfill
     last = popconvo(maybe_print, speaker) # gross hack!
     if last == None:
-      senderf("Failed to pop convo:" + popmsg[0])
+      senderf("Failed to pop convo: " + popmsg[0])
       return True
     else:
-      if len(args) == 3:
-        newconvo = last.replace(args[0], args[1], ct)
+      failure = False
+      try:
+        if option == 'g':
+          newconvo = re.sub(original, substitution, last)
+          pass
+        else :
+          newconvo = re.sub(original, substitution, last, count=1)
+          pass
         pass
-      else:
-        newconvo = last.replace(args[0], args[1])
+      except Exception as e:
+        senderf("Regex badness: " + e.message)
+        newconvo = last
+        failure = True
         pass
-      addconvo(newconvo, speaker[0])
-      senderf("Updated: " + newconvo)
-      return True
-    pass
-  return False
+      finally:
+        addconvo(newconvo, speaker[0])
+        if not failure:
+          senderf("Updated: " + newconvo)
+          pass
+        pass
+      pass
+    return True # convo fix
+  return False # main body
 
 def unload():
   writedb()
