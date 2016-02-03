@@ -1,60 +1,36 @@
-* lurker exports the following commands to regular users:
+* IRC commands
 - !roll <quantity>d<sides>[±<modifier>]: Rolls quantity dice of sides sides,
   and optionally adds or subtracts the modifier to the result.  Follows rules
   of D&D.
-- !deal [<user1> [<user2> [<user3> [<user4>]]]]: Deals a contact bridge hand
-  to users 1,2,3,and 4.
-- !help: Brings you here.
+- !fml: Prints a random FMyLife entry (by popular demand).
+- !test: Reserved keyword.
+- !static: lurker dumps some static.
+** hugging
+- !hug me never: lurker will never hug you again.
 - !hug me: Hugs the user.
 - !hug <target>: Hugs target in the current setting.
-- !fml: Prints a random FMyLife entry (by popular demand).
+** lastfm
 - !np / !fm: If your user name is set with the bot, prints your currently
   playing track.
 - !np set <name> / !fm set <name>: Sets your user name (currently only
   last.fm) to name with the bot.
 - !np <user> / !fm <user>: Prints user's currently playing track.
+** weather
 - !fw: If your location is set with the bot, prints the fucking weather for
   your location.
-- !fw set <place>: Sets your location with the bot to place (zip codes work
-  best; this is a problem with The Fucking Weather's parser, not with lurker).
+- !fw set <place>: Sets your location with the bot to place
+  - Zip codes work best.  This is a problem with The Fucking Weather's parser,
+    not with lurker.
 - !fw <place>: Shows the weather for place; see note on places above.
+** alerts
 - !alert <user> <message>: Adds a pounce on user to tell them message.
-- !anonalert <user> <message>: Adds an anonymous pounce on user to tell them
-  message.
+- !anonalert <user> <message>: Adds an anonymous pounce on user of message.
+** convo
 - !convo: Prints a conversation starter.
-- !convo add <wit>: Adds a conversation starter to the database in the form of
-  wit.
-- !source: Takes you to where you can find a copy of lurker's source.
-- !quack <query> / !q <query> / !ddg <query>: Generates a DuckDuckGo result
-  page for query (note that due to DuckDuckGo's bangs, this may be a redirect;
-  e.g., the result of "!q !w debian").
-- !test: Reserved keyword for whatever I happen to be testing.  Documented so
-  that it will not be taken.
-- !ping: Causes lurker to respond (useful for those who don't want to be
-  hugged).
-- !static: lurker dumps some static.
-- !lantunes / !lt: Displays the current track in lantunes.  Currently, there
-  is only one (known) lantunes installation.
-* lurker exports the following commands to the privileged user:
-- !nick <newnick>: Changes the nick of lurker to newnick.
-- !disconnect: Disconnects lurker.
-- !test: Reserved keyword for whatever I happen to be testing.  Documented so
-  that it will not be taken.
-- !die: Kills lurker (nonviolently, with possibility of resurrection).
-- !join <target>: Joins the target channel (include #,&,+,!, etc.).
-- !say <target> <item>: Says item to target.  Target can be a nick or
-  channel.  Item can contain spaces.
-- !action <target> <item>: Same as !say except with actions.
-* commands not yet exported:
-- !reload: Reloads the do module.  Currently working, but this is not the
-  intended calling / location convention.
-- !sendroll <target> <quantity>d<sides>[±<modifier>]: same as roll except that
-  the result is sent to target (channel or nick).  Currently fully working and
-  slated for deprecation.
-- !seen <user>: Currently not supported.  Will display the time at which the
-  user last spoke.
-- !broadcast <target> <commmand>: Currently not supported.  Will broadcast the
-  command to the specified target.  !sendroll will be deprecated by this.
-- !jacket: If your location is set with the bot (throught !fw set) prints the 
-  doineedajacket for your location
-- !jacket <location>: Shows the doineedajacket for the location (see !jacket)
+- !convo add <wit>: Adds wit to the database of conversation starters.
+* Server interface
+- help: displays some documentation
+- EOF/exit: closes down lurker
+- load <mod>: load a module
+- unload <mod>: unload a module
+- reload <mod>: reloads (as per python) a module
