@@ -28,6 +28,10 @@
 ** convo
 - !convo: Prints a conversation starter.
 - !convo add <wit>: Adds wit to the database of conversation starters.
+- !convo undo: Delete the convo that you just added.
+- !convo fix s/<regex>/<text>/: Replace regex with text in most recent convo.
+- !convo grep <regex>: Begin a search of conversation starter database.
+- !convo next: If a search is in progress, display next entry.
 * Server interface
 - help: displays some documentation
 - EOF/exit: closes down lurker
