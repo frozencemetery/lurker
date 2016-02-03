@@ -1,3 +1,7 @@
+These are the files of the lurker IRC project.
+
+This version of lurker is known as 3.
+
 * IRC commands
 ** general
 - =!roll <quantity>d<sides>[±<modifier>]=: Rolls quantity dice of with sides
