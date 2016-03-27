@@ -5,6 +5,8 @@ from collections import defaultdict
 from module import *
 from ircutil import NICK
 
+CONVO_MAX_LEN = 400
+
 convodb = "modules/rsrc/convo.db"
 
 convos = [] # globalize THIS
@@ -210,7 +212,7 @@ def convofix(cmd, speaker, senderf):
     failure = True
     return True
   finally:
-    if len(newconvo) > 400: # I picked a number fight me
+    if len(newconvo) > CONVO_MAX_LEN: # I picked a number fight me
       addconvo(last, speaker[0])
       senderf("FUCKSTICK was you all along")
       return True
@@ -239,7 +241,11 @@ def cmdmsg(senderf, channel, speaker, cmd, isact):
     senderf(getconvo())
     return True
   elif cmd.startswith("convo add "):
-    addconvo(cmd.split(" ", 2)[2], speaker[0])
+    newconvo = cmd.split(" ", 2)[2]
+    if len(newconvo) > CONVO_MAX_LEN:
+      senderf("I'm afraid I can't do that: would truncate \"%s\"" % newconvo[400:])
+      return True
+    addconvo(newconvo, speaker[0])
     senderf("NOW WE'RE HAVING A GOOD TIME RIGHT")
     return True
   elif cmd.startswith("convo grep "):
