@@ -100,29 +100,24 @@ def convolast(senderf, channel, pattern, speaker):
     pass
   pass
 
-def popconvo(senderf, speaker):
+def maybe_pop(speaker):
   global convos
   global oldconvos
   global lastconvo
   global lastconvoer
 
   if convos == []:
-    senderf("YOU CANNOT KILL THAT IS ALREADY DEAD (no convos found)")
-    pass
+    return 0
   elif lastconvo == None:
-    senderf("No convo found since last reload")
-    pass
+    return 1
   elif lastconvoer.lower() != speaker[0].lower():
-    senderf("You weren't the last convoer, so you can't undo")
-    pass
-  else:
-    convos = oldconvos
-    writedb()
-    senderf("Deleted: " + lastconvo)
-    z = lastconvo
-    lastconvo = None
-    return z
-  pass
+    return 2
+
+  convos = oldconvos
+  writedb()
+  z = lastconvo
+  lastconvo = None
+  return z
 
 def log(channel, nick, line, isact):
   global lastseen
@@ -193,13 +188,7 @@ def convofix(cmd, speaker, senderf):
   orig = cmd[1]
   subst = cmd[2]
 
-  popmsg = [""]
-  def maybe_print(s):
-    popmsg[0] = s
-    pass
-  # note: i no longer know what this does? - cstanfill
-  # note: I do though - frozen
-  last = popconvo(maybe_print, speaker) # gross hack!
+  last = maybe_pop(speaker)
   if last == None:
     senderf("Failed to pop convo: " + popmsg[0])
     return True
@@ -276,7 +265,19 @@ def cmdmsg(senderf, channel, speaker, cmd, isact):
       pass
     return True
   elif cmd == "convo undo":
-    popconvo(senderf, speaker)
+    c = maybe_pop(speaker)
+    if c == 0:
+      senderf("YOU CANNOT KILL THAT IS ALREADY DEAD (no convos found)")
+      pass
+    elif c == 1:
+      senderf("No convo found since last reload")
+      pass
+    elif c == 2:
+      senderf("You weren't the last convoer, so you can't undo")
+      pass
+    else:
+      senderf("Deleted: " + c)
+      return c
     return True
   elif cmd.startswith("convo fix "):
     return convofix(cmd[len("convo fix "):], speaker, senderf)
