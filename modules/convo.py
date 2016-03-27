@@ -191,7 +191,7 @@ def convofix(cmd, speaker, senderf):
   subst = cmd[2]
 
   last = maybe_pop(speaker)
-  if last == None:
+  if last in [0,1,2]:
     senderf("Failed to pop convo: " + popmsg[0])
     return True
 
