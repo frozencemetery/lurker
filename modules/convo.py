@@ -192,7 +192,7 @@ def convofix(cmd, speaker, senderf):
 
   last = maybe_pop(speaker)
   if last in [0,1,2]:
-    senderf("Failed to pop convo: " + popmsg[0])
+    senderf("Failed to pop convo; were you the last speaker?")
     return True
 
   orig = orig.replace("\\/", "/")
