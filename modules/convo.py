@@ -5,6 +5,8 @@ from collections import defaultdict
 from module import *
 from ircutil import NICK
 
+CONVO_MAX_LEN = 400
+
 convodb = "modules/rsrc/convo.db"
 
 convos = [] # globalize THIS
@@ -100,29 +102,24 @@ def convolast(senderf, channel, pattern, speaker):
     pass
   pass
 
-def popconvo(senderf, speaker):
+def maybe_pop(speaker):
   global convos
   global oldconvos
   global lastconvo
   global lastconvoer
 
   if convos == []:
-    senderf("YOU CANNOT KILL THAT IS ALREADY DEAD (no convos found)")
-    pass
+    return 0
   elif lastconvo == None:
-    senderf("No convo found since last reload")
-    pass
+    return 1
   elif lastconvoer.lower() != speaker[0].lower():
-    senderf("You weren't the last convoer, so you can't undo")
-    pass
-  else:
-    convos = oldconvos
-    writedb()
-    senderf("Deleted: " + lastconvo)
-    z = lastconvo
-    lastconvo = None
-    return z
-  pass
+    return 2
+
+  convos = oldconvos
+  writedb()
+  z = lastconvo
+  lastconvo = None
+  return z
 
 def log(channel, nick, line, isact):
   global lastseen
@@ -154,6 +151,88 @@ def regmsg(channame, speaker, cmdstr, isact):
   log(channame, speaker[0], cmdstr, isact)
   pass
 
+def convofix(cmd, speaker, senderf):
+  def iseven(s):
+    even = True
+    for c in s[::-1]:
+      if c != '\\':
+        break
+      even = not even
+      pass
+    return even
+
+  cmd = cmd.split("/")
+
+  if cmd[0] != "s":
+    senderf("FUCKSTICK says what is that")
+    return True
+
+  while not iseven(cmd[1]):
+    cmd[1] += '/' + cmd[2]
+    del(cmd[2])
+    pass
+  while not iseven(cmd[2]):
+    cmd[2] += '/' + cmd[3]
+    del(cmd[3])
+    pass
+
+  option = False
+  if len(cmd) != 4:
+    senderf("FUCKSTICK says nuh-uh")
+    return True
+  if cmd[3] == 'g':
+    option = True
+    pass
+  elif cmd[3] != '':
+    senderf("FUCKSTICK says nice try")
+    return True
+
+  orig = cmd[1]
+  subst = cmd[2]
+
+  last = maybe_pop(speaker)
+  if last == None:
+    senderf("Failed to pop convo: " + popmsg[0])
+    return True
+
+  orig = orig.replace("\\/", "/")
+  subst = subst.replace("\\/", "/")
+  
+  try:
+    failure = False
+    if option:
+      newconvo = re.sub(orig, subst, last)
+      pass
+    else:
+      newconvo = re.sub(orig, subst, last, count=1)
+      pass
+    pass
+  except Exception as e:
+    senderf("Regex badness: " + e.message)
+    failure = True
+    return True
+  finally:
+    if len(newconvo) > CONVO_MAX_LEN: # I picked a number fight me
+      addconvo(last, speaker[0])
+      senderf("FUCKSTICK was you all along")
+      return True
+    else:
+      forbidden = ["\n", "\r", "\b", "\a", "\x7f", "\x00", "\xe2\x80\x8f"]
+      for c in forbidden:
+        if c in newconvo:
+          senderf("FUCKSTICK is YOU")
+          addconvo(last, speaker[0])
+          return True
+        pass
+      pass      
+
+    addconvo(newconvo, speaker[0])
+    if not failure:
+      senderf("Updated: " + newconvo)
+      pass
+    pass
+  return True
+
 def cmdmsg(senderf, channel, speaker, cmd, isact):
   if isact:
     return False
@@ -162,7 +241,11 @@ def cmdmsg(senderf, channel, speaker, cmd, isact):
     senderf(getconvo())
     return True
   elif cmd.startswith("convo add "):
-    addconvo(cmd.split(" ", 2)[2], speaker[0])
+    newconvo = cmd.split(" ", 2)[2]
+    if len(newconvo) > CONVO_MAX_LEN:
+      senderf("I'm afraid I can't do that: would truncate \"%s\"" % newconvo[400:])
+      return True
+    addconvo(newconvo, speaker[0])
     senderf("NOW WE'RE HAVING A GOOD TIME RIGHT")
     return True
   elif cmd.startswith("convo grep "):
@@ -188,49 +271,22 @@ def cmdmsg(senderf, channel, speaker, cmd, isact):
       pass
     return True
   elif cmd == "convo undo":
-    popconvo(senderf, speaker)
-    return True
-  elif cmd.startswith("convo fix"):
-    FUCKSTICK = "s/(.*?)(?<!\\\\)((?:\\\\\\\\)*)\/(.*?)(?<!\\\\)((?:\\\\\\\\)*)\/(g?)$"
-    match = re.match(FUCKSTICK, cmd[10:])
-    if not match:
-      senderf("FUCKSTICK says NO")
-      return True
-    (original, trash, substitution, more_trash, option) = match.groups()
-    popmsg = [""]
-    original += trash
-    substitution = re.escape(substitution + more_trash)
-    def maybe_print(s):
-      popmsg[0] = s
+    c = maybe_pop(speaker)
+    if c == 0:
+      senderf("YOU CANNOT KILL THAT IS ALREADY DEAD (no convos found)")
       pass
-    # note: i no longer know what this does? - cstanfill
-    last = popconvo(maybe_print, speaker) # gross hack!
-    if last == None:
-      senderf("Failed to pop convo: " + popmsg[0])
-      return True
+    elif c == 1:
+      senderf("No convo found since last reload")
+      pass
+    elif c == 2:
+      senderf("You weren't the last convoer, so you can't undo")
+      pass
     else:
-      failure = False
-      try:
-        if option == 'g':
-          newconvo = re.sub(original, substitution, last)
-          pass
-        else :
-          newconvo = re.sub(original, substitution, last, count=1)
-          pass
-        pass
-      except Exception as e:
-        senderf("Regex badness: " + e.message)
-        newconvo = last
-        failure = True
-        pass
-      finally:
-        addconvo(newconvo, speaker[0])
-        if not failure:
-          senderf("Updated: " + newconvo)
-          pass
-        pass
-      pass
-    return True # convo fix
+      senderf("Deleted: " + c)
+      return c
+    return True
+  elif cmd.startswith("convo fix "):
+    return convofix(cmd[len("convo fix "):], speaker, senderf)
   return False # main body
 
 def unload():
