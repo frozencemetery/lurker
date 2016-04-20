@@ -74,22 +74,21 @@ def nextgrep(channel) :
 
 def convolast(senderf, channel, pattern, speaker):
   global lastseen
-
-  match = re.match("^(.*?)(" + NICK + ")(.*?)$", pattern)
+  match = re.match("^<?([@~%+ ]?)(" + NICK + ").*$", pattern)
   if match:
-    prefix, nick, suffix = match.groups()
+    prefix, nick = match.groups()
     if nick.lower() in lastseen[channel].keys():
       last = lastseen[channel][nick.lower()]
       if last.isact:
         addconvo("* {0} {1}".format(last.nick, last.message), speaker)
         pass
       else:
-        if prefix == suffix == "" :
+        if prefix == "" :
           addconvo(last.message, speaker);
           pass
         else:
-          addconvo("{0}{1}{2} {3}".format( \
-              prefix, last.nick, suffix, last.message), speaker)
+          addconvo("<{0}{1}> {2}".format( \
+              prefix, last.nick, last.message), speaker)
           pass
         pass
       senderf("NOW WE'RE HAVING A GOOD TIME RIGHT")
