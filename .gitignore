@@ -1,4 +1,5 @@
 *.pyc
 *~
 \#*\#
-rsrc/*
+modules/rsrc/*
+TAGS
