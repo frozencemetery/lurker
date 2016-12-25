@@ -29,11 +29,13 @@ def writedb():
     pass
   return
 
+# TODO(frozen) Handle escapes of the form %dd
 def unhtml(m):
   m = urllib2.unquote(m)
   m = m.replace("+noredirect/", "")
   m = m.replace("+", " ")
   m = m.replace("&quot;", "\"")
+  m = m.replace("&amp;", "&")
   m = m.replace("%26", "&")
   m = m.replace("/_/", " - ")
   return m
