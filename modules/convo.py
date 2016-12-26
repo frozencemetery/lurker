@@ -56,8 +56,9 @@ def getconvo():
 def grepconvos(channel, regex):
   global convos
   global lastgrep
+  insence = re.IGNORECASE if re.regex.islower() else 0
   matching = filter( \
-    (lambda line: re.match(".*" + regex + ".*", line, re.IGNORECASE)), convos)
+    (lambda line: re.match(".*" + regex + ".*", line, insence)), convos)
   random.shuffle(matching)
   lastgrep[channel] = matching
   return nextgrep(channel)
