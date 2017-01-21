@@ -56,7 +56,18 @@ def getconvo():
 def grepconvos(channel, regex):
   global convos
   global lastgrep
-  insence = re.IGNORECASE if regex.islower() else 0
+  insence = re.IGNORECASE
+  rl = list(regex)
+  i = 0
+  while i < len(rl):
+    if rl[i] == '\\':
+      i += 2
+      continue
+    elif rl[i].isupper():
+      insence = 0
+      break
+    i += 1
+    pass
   matching = filter( \
     (lambda line: re.match(".*" + regex + ".*", line, insence)), convos)
   random.shuffle(matching)
