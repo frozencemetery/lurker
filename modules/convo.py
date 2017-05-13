@@ -237,6 +237,7 @@ def convofix(cmd, speaker, senderf):
 
 # False with yelling on failure
 def insert_convo(senderf, newconvo):
+    global lastconvo
     global oldconvos
 
     newconvo = canonicalize(newconvo)
@@ -256,19 +257,18 @@ def insert_convo(senderf, newconvo):
             return False
         pass
 
+    lastconvo = newconvo
     oldconvos = convos[:]
-    convos.append(convo)
+    convos.append(newconvo)
     open(CONVODB, 'a').write(newconvo + '\n')
     return True
 
 def convoadd(senderf, speaker, newconvo):
-    global lastconvo
     global lastconvoer
 
     if not insert_convo(senderf, newconvo):
         return True
 
-    lastconvo = newconvo
     lastconvoer = speaker
 
     senderf("NOW WE'RE HAVING A GOOD TIME RIGHT")
