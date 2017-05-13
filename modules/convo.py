@@ -49,10 +49,11 @@ def canonicalize(c):
     if len(c) == 0:
         return c
 
-    if c[0] == c[-1] == '"' and re.match('"[,.]? +"', c) is None:
-        return canonicalize(c[1:-1])
-    elif c[0] == c[-1] == "'" and re.match("'[,.]? +'", c) is None:
-        return canonicalize(c[1:-1])
+    inter = c[1:-1]
+    if c[0] == c[-1] == '"' and re.search('"', inter) is None:
+        return canonicalize(inter)
+    elif c[0] == c[-1] == "'" and re.search("'", inter) is None:
+        return canonicalize(inter)
 
     return c
 
