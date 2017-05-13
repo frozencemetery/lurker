@@ -206,7 +206,8 @@ def insert_convo(senderf, newconvo):
                 % newconvo[400:])
         return False
 
-    forbidden = ["\n", "\r", "\b", "\a", "\x7f", "\x00", "\xe2\x80\x8f"]
+    forbidden = ["\n", "\r", "\b", "\a", "\x7f", "\x00", "\x03",
+                 "\xe2\x80\x8f"]
     for c in forbidden:
         if c in newconvo:
             senderf("FUCKSTICK is YOU")
