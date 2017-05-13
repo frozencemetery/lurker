@@ -15,6 +15,46 @@ lastconvo = None # last convo made
 lastconvoer = None # last person who convod, to avoid undoing the wrong one
 oldconvos = None # convo before last add operation
 
+REPLACE_DICT = {
+    '‘': "'",
+    '’': "'",
+    '“': '"',
+    '”': '"',
+    'ﬁ': "fi",
+    "ﬀ": "ff",
+    "ﬂ": "fl",
+    "ﬃ": "ffi",
+    "ﬄ": "ffl",
+    "Ĳ": "IJ",
+    "Ĳ": "IJ",
+    "ĳ": "ij",
+    "…": "...",
+    "—": "--",
+    " ": " ",
+    "​": " ",
+}
+def canonicalize(c):
+    if not c:
+        return ""
+
+    c = c.strip()
+
+    for k in REPLACE_DICT.keys():
+        if k in c:
+            c = c.replace(k, REPLACE_DICT[k])
+            pass
+        pass
+
+    if len(c) == 0:
+        return c
+
+    if c[0] == c[-1] == '"' and re.match('"[,.]? +"', c) is None:
+        return canonicalize(c[1:-1])
+    elif c[0] == c[-1] == "'" and re.match("'[,.]? +'", c) is None:
+        return canonicalize(c[1:-1])
+
+    return c
+
 def writedb():
     return open(CONVODB, 'w').write('\n'.join(convos) + '\n')
 
@@ -198,6 +238,7 @@ def convofix(cmd, speaker, senderf):
 def insert_convo(senderf, newconvo):
     global oldconvos
 
+    newconvo = canonicalize(newconvo)
     if not newconvo:
         senderf("Empty convo, ignoring")
         return False
@@ -207,7 +248,7 @@ def insert_convo(senderf, newconvo):
         return False
 
     forbidden = ["\n", "\r", "\b", "\a", "\x7f", "\x00", "\x03",
-                 "\xe2\x80\x8f"]
+                 "\xe2\x80\x8f", "\xe2\x80\xae"]
     for c in forbidden:
         if c in newconvo:
             senderf("FUCKSTICK is YOU")
