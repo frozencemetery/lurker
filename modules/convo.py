@@ -149,7 +149,7 @@ def convolast(senderf, channel, pattern, speaker):
         return convoadd(senderf, speaker, last["line"]);
 
     return convoadd(senderf, speaker,
-                    "<%s%s> %s" % (prefix, last["nick"], last["line"]))
+                    "<%s%s> %s" % (prefix, last["nick"][0], last["line"]))
 
 def maybe_pop(speaker):
     global convos
