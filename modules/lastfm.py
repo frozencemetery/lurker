@@ -43,8 +43,9 @@ def unhtml(m):
 def cmdmsg(senderf, channame, speaker, cmdstr, isact):
     global users
 
-    if cmdstr.startswith("fm") or cmdstr.startswith("np"):
-        cmd = cmdstr.split(" ", 2)
+    cmdstr = cmdstr.strip()
+    cmd = cmdstr.split(" ", 2)
+    if cmd[0] in ["fm", "np"]:
         if len(cmd) == 3 and cmd[1] == "set":
             u = cmd[2]
             users[speaker[0]] = u
