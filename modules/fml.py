@@ -1,5 +1,5 @@
 import re
-import urllib2
+import requests
 
 from module import *
 
@@ -8,11 +8,10 @@ fmlqueue = []
 def obtain():
     global fmlqueue
 
-    html = urllib2.urlopen("http://www.fmylife.com/random").read()
+    html = requests.get(urlopen("http://www.fmylife.com/random").text
     html = re.findall("Today.*?FML", html)
-    del(html[0]) # delete how to make an FML
     html = [re.sub("\<.*?>", "", x) for x in html]
-    fmlqueue += html
+    fmlqueue += [h for h in html if len(h) < 400]
     return
 
 def cmdmsg(senderf, channel, speaker, cmd, isact):
