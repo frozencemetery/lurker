@@ -93,8 +93,8 @@ class Lurker(IrcListener, cmd.Cmd):
           self.do_load(module)
           print("autoloaded module: " + module)
           pass
-        except:
-          print("module '" + module + "' failed to autoload")
+        except Exception as e:
+          print("module '" + module + "' failed to autoload: " + str(e))
           pass
         pass
       pass
