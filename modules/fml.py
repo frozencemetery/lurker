@@ -12,6 +12,7 @@ def obtain():
     html = re.findall("Today.*?FML", html)
     html = [re.sub("\<.*?>", "", x) for x in html]
     fmlqueue += [h for h in html if len(h) < 400]
+    fmlqueue = list(set(fmlqueue)) # great api, folks
     return
 
 def cmdmsg(senderf, channel, speaker, cmd, isact):
