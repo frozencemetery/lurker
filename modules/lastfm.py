@@ -1,5 +1,5 @@
 import re
-import urllib
+import requests
 import urllib2
 
 import json as J
@@ -64,8 +64,7 @@ def cmdmsg(senderf, channame, speaker, cmdstr, isact):
                 return True
             pass
 
-        url = "http://www.last.fm/user/" + u
-        response = urllib2.urlopen(url).read()
+        response = requests.get("http://www.last.fm/user/" + u).text
         response = response[response.index("Recent") + len("Recent"):]
         m = re.search("(?<=/music/)([^/\n]*)/[^/\n]*/([^/\n]*?)(?=\")",
                       response)
