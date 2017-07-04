@@ -1,6 +1,7 @@
 These are the files of the lurker IRC project.
 
-This version of lurker is known as 3.
+This version of lurker is known as 3.  Therefore, it requires python2.  lurker
+is in rolling-release mode.  lurker also requires python-requests.
 
 * IRC commands
 ** general
