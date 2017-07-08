@@ -64,7 +64,7 @@ def cmdmsg(senderf, channame, speaker, cmdstr, isact):
                 return True
             pass
 
-        response = requests.get("http://www.last.fm/user/" + u).text
+        response = requests.get("https://www.last.fm/user/" + u).text
         response = response[response.index("Recent") + len("Recent"):]
         m = re.search("(?<=/music/)([^/\n]*)/[^/\n]*/([^/\n]*?)(?=\")",
                       response)

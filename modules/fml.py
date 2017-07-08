@@ -8,7 +8,7 @@ fmlqueue = []
 def obtain():
     global fmlqueue
 
-    html = requests.get("http://www.fmylife.com/random").text
+    html = requests.get("https://www.fmylife.com/random").text
     html = re.findall("Today.*?FML", html)
     html = [re.sub("\<.*?>", "", x) for x in html]
     fmlqueue += [h for h in html if len(h) < 400]
