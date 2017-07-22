@@ -1,6 +1,6 @@
-import urllib2
-import re
 import random
+import re
+import requests
 
 import json as J
 
@@ -12,8 +12,13 @@ lookup = {}
 def loaddict():
     global lookup
 
-    with open(dictlocat, 'r') as f:
-        lookup = J.load(f)
+    try:
+        with open(dictlocat, 'r') as f:
+            lookup = J.load(f)
+            pass
+        pass
+    except:
+        print("failed to load tfw.dict; corruption possible!")
         pass
     return
 
@@ -72,10 +77,7 @@ def cmdmsg(senderf, channame, speaker, cmdstr, isact):
     else:
         return False
     try:
-        url = "http://thefuckingweather.com/?where="
-        name = urllib2.quote(name)
-        url += name
-        m = urllib2.urlopen(url).read()
+        m = requests.get("http://thefuckingweather.com/?where=" + name).text
 
         temp = int(re.search(
             "(?<=<span class=\"temperature\" tempf=\").*?(?=\">)", m)
