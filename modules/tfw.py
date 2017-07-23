@@ -1,8 +1,12 @@
+# coding=utf8
+
 import random
 import re
 import requests
 
 import json as J
+
+from bs4 import BeautifulSoup as BS
 
 from module import *
 
@@ -31,7 +35,48 @@ def writedict():
     return
 
 def coff(f):
-    return str(int( (int(f) - 32.0) * 5 / 9 ))
+    return int( (int(f) - 32.0) * 5 / 9 )
+
+def get_cute(st):
+    t = int(st)
+    ct = coff(t)
+    temps = [t, ct]
+    if 69 in temps:
+        return "IT'S FUCKING SEXY TIME"
+    elif t == 32:
+        return "TWO NIPPLES MOTHERFUCKER"
+    elif ct == 20:
+        return "NO NIPPLES MOTHERFUCKER"
+    elif 21 in temps:
+        return "FUCKING BLACKJACK"
+    elif 13 in temps:
+        return "WHO BROKE A FUCKING MIRROR"
+    elif 7 in temps:
+        return "IT'S YOUR LUCKY FUCKING DAY"
+    elif t < -75:
+        return "GOOD LUCK BUILDING A FIRE ASSHOLE"
+    elif t == 100:
+        return "IF TEMPERATURE WERE A PERCENT YOU'D HAVE ALL OF IT"
+    elif t < 32:
+        # "frozen" range
+        return random.choice(
+            [ "IT'S FUCKING COLD"
+            , "MY NIPPLES CAN CUT GLASS"
+            ])
+    elif t < 50 or 100 > t >= 75:
+        return random.choice(
+            [ "WEATHER IS FUCKING HAPPENING"
+            , "GOOD DAY FOR CLAM EROTICA"
+            , "IT'S RAINING MEN"
+            , "CHOCOLATE RAIN"
+            , "CAN SOMEONE CHECK THE PRESSURE IN MY BELL VALVE"
+            , "MY CAR WON'T FUCKING START"
+            ])
+    elif t < 68:
+        return "IT'S FUCKING HOODIE WEATHER"
+    elif t < 75:
+        return "YOU COULD WALK OUTSIDE AND NOT NOTICE"
+    return "TOO HOT FOR WEATHER MESSAGES"
 
 def cmdmsg(senderf, channame, speaker, cmdstr, isact):
     global lookup
@@ -44,17 +89,6 @@ def cmdmsg(senderf, channame, speaker, cmdstr, isact):
             senderf(speaker[0] +
                     ": I don't know your location!  Try `!fw set place`.")
             return True
-
-        switch = random.randint(1,30)
-        if switch == 1:
-            senderf("IT'S RAINING MEN")
-            return True
-        elif switch == 2:
-            senderf("CHOCOLATE RAIN")
-            return True
-        elif switch == 3:
-            senderf("Cloudy.  With a chance of meatballs.")
-            return True
         pass
     elif cmdstr.startswith("fw set "):
         name = cmdstr.split(" ", 2)[2]
@@ -62,73 +96,32 @@ def cmdmsg(senderf, channame, speaker, cmdstr, isact):
         pass
     elif cmdstr.startswith("fw "):
         name = cmdstr.split(" ", 1)[1]
-
-        switch = random.randint(1,30)
-        if switch == 1:
-            senderf("IT'S RAINING MEN")
-            return True
-        elif switch == 2:
-            senderf("CHOCOLATE RAIN")
-            return True
-        elif switch == 3:
-            senderf("Cloudy.  With a chance of meatballs.")
-            return True
         pass
     else:
         return False
+
+    u = "https://www.wunderground.com/cgi-bin/findweather/getForecast?query="
     try:
-        m = requests.get("http://thefuckingweather.com/?where=" + name).text
+        s = BS(requests.get(u + name).text, "lxml")
+        place = s.title.string.split(" Forecast")[0]
+        forecast = s.find_all("div",
+                              attrs={"id": "curCond"})[0].span.contents[0]
+        current = s.find_all("span", attrs={"data-variable": "temperature"})[0].span.contents[0]
 
-        temp = int(re.search(
-            "(?<=<span class=\"temperature\" tempf=\").*?(?=\">)", m)
-                   .group(0))
-        location = re.search(
-            "(?<=<span id=\"locationDisplaySpan\" class=\"small\">).*?(?=</span>)",
-            m).group(0)
-        status = re.search("(?<=<p class=\"remark\">).*?(?=</p>)", m).group(0)
-        paren = re.search("(?<=<p class=\"flavor\">).*?(?=</p>)", m).group(0)
-        dayv = re.search(
-            "(?<=<th>DAY</th><th style=\"width:7.5em;\">).*(?=</th>)",
-            m).group(0)
-        highv = re.search(
-            "(?<=<th>HIGH</th><td class=\"temperature\" tempf=\").*(?=\r)",
-            m).group(0)
-        lowv = re.search(
-            "(?<=<th>LOW</th><td class=\"temperature\" tempf=\").*(?=\r)",
-            m).group(0)
-        fcv = re.search("(?<=<th>FORECAST</th><td>).*(?=\r)", m).group(0)
-
-        highv = re.search("(?<=<td class=\"temperature\" tempf=\").*",
-                          highv).group(0)
-        tempha = int(re.search(".*?(?=\">)", highv).group(0))
-        highv = re.search("(?<=tempf=\").*", highv).group(0)
-        templa = int(re.search(".*?(?=\">)", lowv).group(0))
-        lowv = re.search("(?<=tempf=\").*", lowv).group(0)
-        fca = re.search(".*?(?=</td>)", fcv).group(0)
-        fcv = re.search("(?<=<td>).*", fcv).group(0)
-        daya = re.search(".*?(?=</th>)", dayv).group(0)
-        dayv = re.search("(?<=em;\">).*", dayv).group(0)
-        dayb = re.search(".*?(?=</th>)", dayv).group(0)
-        temphb = int(re.search(".*?(?=\">)", highv).group(0))
-        templb = int(re.search(".*?(?=\">)", lowv).group(0))
-        fcb = re.search(".*?(?=</td>)", fcv).group(0)
-
-        magic = "".join([
-            "\x02", location, "\x0F: ", str(temp), " F (", str(coff(temp)),
-            " C) | ", status, " (", paren, ") | ", daya, ": High ",
-            str(tempha), " F (", str(coff(tempha)), " C), Low ", str(templa),
-            " F (", str(coff(templa)), " C).  ", fca, " | ", dayb, ": High ",
-            str(temphb), " F (", str(coff(temphb)), " C), Low ", str(templb),
-            " F (", str(coff(templb)), " C).  ", fcb
-        ])
-        magic = magic.replace("ITS", "IT'S")
-
-        senderf(magic)
+        # ugh, too precise
+        current = current[:current.index('.')]
         pass
-    except:
+    except Exception as e:
         senderf("The weather machine is probably broken, sorry.")
+        print(e)
         return True
-    pass
+
+    s = "%(user)s: %(place)s %(forecast)s %(current)sF/%(current_c)sC %(cute)s"
+    d = {"user": speaker[0], "place": place, "current": current,
+         "forecast": forecast, "current_c": coff(current),
+         "cute": get_cute(current)}
+    senderf(s % d)
+    return True
 
 
 def unload():
