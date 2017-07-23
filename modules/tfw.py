@@ -106,10 +106,13 @@ def cmdmsg(senderf, channame, speaker, cmdstr, isact):
         place = s.title.string.split(" Forecast")[0]
         forecast = s.find_all("div",
                               attrs={"id": "curCond"})[0].span.contents[0]
-        current = s.find_all("span", attrs={"data-variable": "temperature"})[0].span.contents[0]
 
-        # ugh, too precise
-        current = current[:current.index('.')]
+        current = s.find_all("span", attrs={"data-variable": "temperature"})
+        current = current[0].span.contents[0]
+        if "." in current: # ugh, too precise
+            current = current[:current.index('.')]
+            pass
+
         pass
     except Exception as e:
         senderf("The weather machine is probably broken, sorry.")
