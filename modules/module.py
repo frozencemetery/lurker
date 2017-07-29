@@ -1,25 +1,25 @@
 # default functions for modules to import
 # e.g.,
-#   from module import *
+#     from module import *
 # then override the relevant functions
 
 def cmdmsg(senderf, channame, speaker, cmdstr, isact):
-  return False
+    return False
 
 def regmsg(channame, speaker, cmdstr, isact):
-  return
+    return
 
 def userjoin(channame, joiner):
-  return
+    return
 
 def userpart(channame, parter, message):
-  return
+    return
 
 def botjoin(channame):
-  return
+    return
 
 def botpart(channame):
-  return
+    return
 
 def unload():
-  return
+    return

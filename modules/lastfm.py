@@ -1,6 +1,5 @@
 import re
 import requests
-import urllib2
 
 import json as J
 
@@ -16,6 +15,7 @@ def loaddict():
         with open(lastfmdict, 'r') as f:
             users = J.load(f)
             pass
+        pass
     except:
         print "failed to load lastfm.dict; corruption possible!"
         pass
@@ -31,7 +31,6 @@ def writedb():
 
 # TODO(frozen) Handle escapes of the form %dd
 def unhtml(m):
-    m = urllib2.unquote(m)
     m = m.replace("+noredirect/", "")
     m = m.replace("+", " ")
     m = m.replace("&quot;", "\"")
