@@ -14,7 +14,7 @@ from irc.irclib import IrcConnection, IrcListener
 
 def frob_sender(owner, sender):
     privlam = lambda message, isact=False: (
-        owner.send.privmsg(sender[0], message) if not isact
+        owner.send.privmsg(sender[0], message.encode("utf8")) if not isact
         else owner.send.action(sender[0], message))
     new = list(sender)
     new.append(privlam)
