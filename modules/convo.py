@@ -2,6 +2,8 @@
 import random
 import re
 
+import json as J
+
 from collections import defaultdict
 from module import *
 from ircutil import NICK
@@ -58,32 +60,26 @@ def canonicalize(c):
     return c
 
 def writedb():
-    return open(CONVODB, 'w').write('\n'.join(convos) + '\n')
+    return J.dump(convos, open(CONVODB, "w"))
 
 def loaddb():
     global convos
 
     try:
-        convos = open(CONVODB, 'r').read().split('\n')
+        convos = J.load(open(CONVODB, "r"))
         pass
     except:
         print "Failed to load convo.db; corruption possible!"
         return
     finally:
-        convos = [] if convos is None else convos
-        pass
-
-    # trailing newline from editors.  Thrashes slightly, but hey.
-    if convos[-1] == "":
-        del(convos[-1])
-        writedb()
+        convos = {} if convos is None else convos
         pass
     print "loaded okay"
     return
 
 def convo(senderf):
     try:
-        senderf(random.choice(convos))
+        senderf(random.choice(convos.keys()))
         pass
     except:
         senderf("CONVO.DB EMPTY; WORST PARTY EVER")
@@ -119,7 +115,7 @@ def convogrep(senderf, channel, regex):
                 break
             i += 1
             pass
-        matching = [line for line in convos
+        matching = [line for line in convos.keys()
                     if re.match(".*" + regex + ".*", line, insence)]
         random.shuffle(matching)
         lastgrep[channel] = matching
@@ -156,7 +152,7 @@ def maybe_pop(speaker):
     global lastconvo
     global lastconvoer
 
-    if convos == []:
+    if convos == {}:
         return 0
     elif lastconvo == None:
         return 1
@@ -227,17 +223,17 @@ def convofix(cmd, speaker, senderf):
         pass
     except Exception as e:
         senderf("Regex badness: " + e.message)
-        insert_convo(senderf, last)
+        insert_convo(senderf, speaker, last)
         return True
 
     if not convoadd(senderf, speaker, newconvo):
-        insert_convo(senderf, last)
+        insert_convo(senderf, speaker, last)
         return True
 
     return True
 
 # False with yelling on failure
-def insert_convo(senderf, newconvo):
+def insert_convo(senderf, speaker, newconvo):
     global lastconvo
     global oldconvos
 
@@ -259,15 +255,15 @@ def insert_convo(senderf, newconvo):
         pass
 
     lastconvo = newconvo
-    oldconvos = convos[:]
-    convos.append(newconvo)
-    open(CONVODB, 'a').write(newconvo + '\n')
+    oldconvos = {k: v for k, v in convos.iteritems()} # deep copy
+    convos[newconvo] = speaker
+    writedb()
     return True
 
 def convoadd(senderf, speaker, newconvo):
     global lastconvoer
 
-    if not insert_convo(senderf, newconvo):
+    if not insert_convo(senderf, speaker, newconvo):
         return True
 
     lastconvoer = speaker
