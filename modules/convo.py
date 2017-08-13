@@ -255,7 +255,7 @@ def insert_convo(senderf, speaker, newconvo):
         pass
 
     lastconvo = newconvo
-    oldconvos = {k: v for k, v in convos.iteritems()} # deep copy
+    oldconvos = convos.copy()
     convos[newconvo] = speaker
     writedb()
     return True
