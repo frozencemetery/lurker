@@ -93,6 +93,7 @@ def cmdmsg(senderf, channame, speaker, cmdstr, isact):
     elif cmdstr.startswith("fw set "):
         name = cmdstr.split(" ", 2)[2]
         lookup[speaker[0]] = name
+        writedict()
         pass
     elif cmdstr.startswith("fw "):
         name = cmdstr.split(" ", 1)[1]
